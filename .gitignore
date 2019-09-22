@@ -8,7 +8,7 @@ __pycache__/
 
 # Distribution / packaging
 .Python
-build/
+#docs/build/
 develop-eggs/
 dist/
 downloads/
@@ -102,3 +102,9 @@ venv.bak/
 
 # mypy
 .mypy_cache/
+/.idea/PythonPOOA_MaSeriePrefere.iml
+/.idea/vcs.xml
+/.idea/modules.xml
+/.idea/misc.xml
+/.idea/.gitignore
+/.idea/inspectionProfiles/profiles_settings.xml
