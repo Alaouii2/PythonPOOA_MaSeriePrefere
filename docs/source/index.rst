@@ -5,7 +5,7 @@ Welcome to MaSeriePreferee's documentation!
    :maxdepth: 2
    :caption: Contents:
 
-.. automodule:: essaye
+.. automodule:: requestes
    :members:
 
 
