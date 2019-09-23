@@ -7,5 +7,15 @@ Le projet consiste à créer un site web ou une application qui permet à un uti
 L’application devra forcément avoir une interface graphique.
 
 ## Cahier des charges
-Livrable
-========
+Interface graphique. Soit : 
+* Interface web
+* Client lourd
+
+Compte client avec :
+* Liste de série préférée
+* Résumés des épisodes
+* Alerte de la prochaine diffusion d'un épisode d'une série dans la liste
+
+Utilitaires :
+* Liste de série via des api des bases de données de séries
+* Possibilité d'ajout à sa liste
