@@ -9,16 +9,12 @@ L’application devra forcément avoir une interface graphique.
 ## Cahier des charges
 Interface graphique. Soit : 
 * Interface web
-
-** Django
-
-** Flask
+  * Django
+  * Flask
 
 * Client lourd
-
-** PyQT
-
-** Tkinter
+  * PyQT
+  * Tkinter
 
 Compte client avec :
 * Liste de série préférée
