@@ -1,3 +1,1 @@
-print('hello')
-print('bye')
-print('yes')
+import django
