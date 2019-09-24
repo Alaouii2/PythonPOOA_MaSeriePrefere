@@ -9,7 +9,12 @@ L’application devra forcément avoir une interface graphique.
 ## Cahier des charges
 Interface graphique. Soit : 
 * Interface web
+  * Django
+  * Flask
+
 * Client lourd
+  * PyQT
+  * Tkinter
 
 Compte client avec :
 * Liste de série préférée
@@ -19,3 +24,14 @@ Compte client avec :
 Utilitaires :
 * Liste de série via des api des bases de données de séries
 * Possibilité d'ajout à sa liste
+
+## Détails fonctionels
+Tri des séries : en fonction du contenu des API
+* Alphabétique
+* Catégories
+* Plateforme
+* etc...
+
+Liste des API :
+* https://api.thetvdb.com/swagger
+* https://api.betaseries.com
