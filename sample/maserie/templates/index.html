@@ -5,6 +5,18 @@
     <title>Title</title>
 </head>
 <body>
+<div>
+    {% extends 'base.html' %}
 
+{{ url_for('static', filename='css/bootstrap/bootstrap.min.css') }} <!-- La phrase sera affichée dans la page -->
+{% if blur: %}Je ne m'affiche que si "blur" est vrai.{% endif %}
+{# ceci est un commentaire #}
+    {% block content %}
+  <!-- Header -->
+  <header>
+  Bonjour
+  </header>
+{% endblock %}
+</div>
 </body>
 </html>

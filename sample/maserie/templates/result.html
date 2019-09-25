@@ -5,6 +5,12 @@
     <title>Title</title>
 </head>
 <body>
-
+{% extends 'base.html' %}
+{% block content %}
+<h1 id="user_name">Salut à toi {{user_name}} !</h1>
+<div class="col-lg-6 col-lg-offset-3">
+  {% include 'card.html' %}
+</div>
+{% endblock %}
 </body>
 </html>

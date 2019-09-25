@@ -1,4 +1,4 @@
-from flask import Flask
+from flask import Flask, render_template
 
 app = Flask(__name__)
 
@@ -7,8 +7,16 @@ app.config.from_object('config')
 # To get one variable, tape app.config['MY_VARIABLE']
 
 @app.route('/')
+@app.route('/index/')
 def index():
-    return "Hello world !"
+    return render_template('index.html')
+
+@app.route('/result/')
+def result():
+    return render_template('result.html',
+                           user_name="Tom",
+                           description="Bonjou c'est moi dingue non ?",
+                           blur=True)
 
 if __name__ == "__main__":
     app.run()
