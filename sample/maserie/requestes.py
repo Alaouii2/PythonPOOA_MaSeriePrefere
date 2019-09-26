@@ -1,3 +1,7 @@
+"""
+    Ce module est absolument incroyable
+"""
+
 import requests
 
 url = "https://api.betaseries.com/shows/list"

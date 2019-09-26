@@ -5,9 +5,11 @@ Welcome to MaSeriePreferee's documentation!
    :maxdepth: 2
    :caption: Contents:
 
-.. automodule:: requestes
+.. automodule:: run
    :members:
 
+.. automodule:: maserie.models
+    :members:
 
 
 Indices and tables

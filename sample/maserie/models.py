@@ -1,6 +1,11 @@
+"""
+    Je suis actuellement le commentaire le plus inutile du monde, quel modele !
+"""
+
 from flask_sqlalchemy import SQLAlchemy
 from .views import app
 import logging as lg
+
 
 # Create database connection object
 db = SQLAlchemy(app)

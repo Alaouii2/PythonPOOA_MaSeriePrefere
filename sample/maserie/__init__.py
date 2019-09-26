@@ -1,3 +1,7 @@
+"""
+    Bonjour vous etes dans __init__, pas mal non ?
+"""
+
 from flask import Flask
 
 from .views import app
