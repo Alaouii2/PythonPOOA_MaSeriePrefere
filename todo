@@ -1,0 +1,14 @@
+Reste :
+setup prerequis :
+tests et couverture
+logging
+setup developpement :
+bootstrap
+deploiement :
+pipeline
+
+Done :
+venv et requirements
+doc
+serveur
+bdd
