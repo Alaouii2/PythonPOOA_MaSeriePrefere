@@ -3,19 +3,22 @@
 import unittest
 from flask_testing import LiveServerTestCase
 from selenium import webdriver
+import context
+from sample.maserie import app
+from sample.maserie import models
 
-from .. import app
-from .. import models
 
 class BasicTestSuite(unittest.TestCase):
     """Basic test cases."""
 
-    def test_absolute_truth_and_meaning(self):
+    @staticmethod
+    def test_absolute_truth_and_meaning():
         assert True
 
 
 if __name__ == '__main__':
     unittest.main()
+
 
 class TestUserTakesTheTest(LiveServerTestCase):
     def create_app(self):
