@@ -16,10 +16,6 @@ class BasicTestSuite(unittest.TestCase):
         assert True
 
 
-if __name__ == '__main__':
-    unittest.main()
-
-
 class TestUserTakesTheTest(LiveServerTestCase):
     def create_app(self):
         # Fichier de config uniquement pour les tests.
@@ -43,3 +39,8 @@ class TestUserTakesTheTest(LiveServerTestCase):
         self.driver.get(self.get_server_url())
         # L'adresse dans l'url doit être celle que l'on attend.
         assert self.driver.current_url == 'http://localhost:8943/'
+
+
+
+if __name__ == '__main__':
+    LiveServerTestCase.main()
