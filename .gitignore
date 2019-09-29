@@ -109,3 +109,6 @@ venv.bak/
 /.idea/.gitignore
 /.idea/inspectionProfiles/profiles_settings.xml
 /.idea/encodings.xml
+/tests/app_test.db
+/.idea/dataSources.local.xml
+/.idea/dataSources.xml
