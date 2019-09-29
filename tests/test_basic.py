@@ -8,18 +8,10 @@ from sample.maserie import app
 from sample.maserie import models
 
 
-class BasicTestSuite(unittest.TestCase):
-    """Basic test cases."""
-
-    @staticmethod
-    def test_absolute_truth_and_meaning():
-        assert True
-
-
 class TestUserTakesTheTest(LiveServerTestCase):
     def create_app(self):
         # Fichier de config uniquement pour les tests.
-        app.config.from_object('fbapp.tests.config')
+        app.config.from_object('tests.config')
         return app
 
     # Méthode exécutée avant chaque test
@@ -41,6 +33,5 @@ class TestUserTakesTheTest(LiveServerTestCase):
         assert self.driver.current_url == 'http://localhost:8943/'
 
 
-
 if __name__ == '__main__':
-    LiveServerTestCase.main()
+    unittest.main()
