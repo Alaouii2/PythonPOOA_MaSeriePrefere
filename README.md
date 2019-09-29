@@ -34,4 +34,4 @@ Tri des séries : en fonction du contenu des API
 
 Liste des API :
 * https://api.thetvdb.com/swagger
-* https://api.betaseries.com
+* https://www.betaseries.com/api/
