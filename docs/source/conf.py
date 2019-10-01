@@ -61,3 +61,5 @@ html_theme = 'alabaster'
 html_static_path = ['_static']
 
 master_doc = 'index'
+
+autoclass_content = 'both'

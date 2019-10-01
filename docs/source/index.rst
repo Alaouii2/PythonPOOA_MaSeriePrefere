@@ -3,13 +3,13 @@ Welcome to MaSeriePreferee's documentation!
 
 .. toctree::
    :maxdepth: 2
-   :caption: Contents:
+
+        adieu <adieu.rst>
+        bonjour <bonjour.rst>
 
 .. automodule:: run
    :members:
 
-.. automodule:: maserie.models
-    :members:
 
 
 Indices and tables
