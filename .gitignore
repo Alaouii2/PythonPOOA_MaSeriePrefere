@@ -112,3 +112,5 @@ venv.bak/
 /tests/app_test.db
 /.idea/dataSources.local.xml
 /.idea/dataSources.xml
+/docs/
+/tests/
