@@ -5,7 +5,6 @@
 
 from flask_sqlalchemy import SQLAlchemy
 from .views import app
-from .log_facilities import logger
 
 
 # Create database connection object
