@@ -1,36 +1,34 @@
-"""
-    views, pour vous servir
-"""
-
 from flask import Flask, render_template, url_for, request
 
 app = Flask(__name__)
 
 # Config options - Make sure you created a 'config.py' file.
 app.config.from_object('config')
-
-
 # To get one variable, tape app.config['MY_VARIABLE']
 
+from .utils import find_content, OpenGraphImage
+
 @app.route('/')
-@app.route('/index/')
-def index():
-    return render_template('index.html')
+@app.route('/home/')
+def home():
+    return render_template('home.html')
 
+@app.route('/series/')
+def series():
+    return render_template('series.html')
 
-@app.route('/result/')
-def result():
-    user_name = request.args.get("user_name")
-    return render_template('result.html',
-                           user_name=user_name,
-                           description="Bonjou c'est moi dingue non ?",
-                           blur=True)
+@app.route('/about/')
+def about():
+    return render_template('about.html')
 
+@app.route('/contact/')
+def contact():
+    return render_template('contact.html')
 
-@app.route('/contents/<content_id>/')
-def content(content_id):
-    return '%s' % content_id
+@app.route('/game-single/')
+def gamesingle():
+    return render_template('game-single.html')
 
-
-if __name__ == "__main__":
-    app.run()
+# @app.route('/contents/<int:content_id>/')
+# def content(content_id):
+#     return '%s' % content_id
