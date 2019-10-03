@@ -4,22 +4,11 @@
 """
 
 from flask_sqlalchemy import SQLAlchemy
-from .views import app
+from views import app
 import datetime
 
 # Create database connection object
 db = SQLAlchemy(app)
-
-
-# class Content(db.Model):
-#
-#     id = db.Column(db.Integer, primary_key=True)
-#     description = db.Column(db.String(200), nullable=False)
-#     gender = db.Column(db.Integer(), nullable=False)
-#
-#     def __init__(self, description, gender):
-#         self.description = description
-#         self.gender = gender
 
 
 class Client(db.Model):
@@ -88,7 +77,7 @@ class Liste_serie_preferee(db.Model):
     id_client = db.Column(db.Integer, db.ForeignKey(Client.id_client))
 #    ids_serie = db.Column(db.ARRAY(db.Integer), nullable=True)
 
-    def __init__(self, id_client, ids_serie):
+    def __init__(self, id_client):
         self.id_client = id_client
 #        self.ids_serie = ids_serie
 
@@ -96,27 +85,23 @@ class Liste_serie_preferee(db.Model):
 def init_db():
     db.drop_all()
     db.create_all()
-#    db.session.add(Content("This is iughukygv!!!", 1))
-#    db.session.add(Content("What's your favorite scary movie ?", 0))
 
     db.session.add(Client("bonjour@salut.com", "mdp", "username"))
     db.session.add(Serie_disponible("Naruto", "Un ninja pas comme les autres", 10, "ninja", datetime.date(1995, 1, 1), "masashi kishimoto"))
     db.session.add(Serie_disponible("Bleach", "Des hollows à en pleuvoir", 20, "samourai", datetime.date(1997, 3, 5), "shigeru myamoto"))
     db.session.add(Saison(1, 3, 20))
     db.session.add(Episode(1, "Bonjour je suis l'episode 3", datetime.datetime(year=1995, month=12, day=4, hour=22, minute=20), 3))
-
     db.session.add(Liste_serie_preferee(1))
     db.session.commit()
+
     client = Client.query.get(1)
     serie = Serie_disponible.query.get(1)
     saison = Saison.query.get(1)
     episode = Episode.query.get(1)
     liste = Liste_serie_preferee.query.get(1)
+
     print(client.adresse_mail)
     print(serie.titre_serie)
     print(saison.n_episode)
     print(episode.duree_episode)
     print(liste.id_client)
-
-
-
