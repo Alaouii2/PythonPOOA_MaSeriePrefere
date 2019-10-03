@@ -21,9 +21,9 @@ def index():
 @app.route('/result/')
 def result():
     user_name = request.args.get("user_name")
-    return render_template('result.html',
+    return render_template('index.html',
                            user_name=user_name,
-                           description="Bonjou c'est moi dingue non ?",
+                           description="Bonjour c'est moi dingue non ?",
                            blur=True)
 
 
