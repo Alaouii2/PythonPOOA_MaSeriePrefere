@@ -1,7 +1,8 @@
 """
     Ce module est absolument incroyable
 """
-
+from models import db
+import smtplib
 import requests
 
 url = "https://api.betaseries.com/shows/list"
@@ -46,4 +47,34 @@ def inscription_base():
 
 # notification serie preferee et recente
 def notification():
+    client = db.session.query('Client')
+    for Client in client:
+        Liste_Notif=[]
+        Liste_préférée = serie_préférée(Client)
+        for serie in Liste_préférée:
+            prochaine_episode= serie.nextEpisode() #fonction à définir
+        if prochaine_episode is None:
+            continue
+        Liste_Notif.append(prochaine_episode)
+
+        if len(Liste_Notif) > 0:
+            envoi_email(Client.email,Liste_Notif)
+def envoi_email(mail,liste):
+    server = smtplib.SMTP_SSL('smtp.gmail.com', 500)
+    server.ehlo()
+    server.login('ouraorphe@gmail.com','55555555')
+
+
+
+
+
+
+    pass
+
+
+
+
+
+
+
     pass
