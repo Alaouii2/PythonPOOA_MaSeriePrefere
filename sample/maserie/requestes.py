@@ -6,22 +6,44 @@ import requests
 
 url = "https://api.betaseries.com/shows/list"
 
-querystring = {"key":"7c2f686dfaad","v":"3.0","limit":"1"}
+# Page d'accueil
+def accueil():
+    querystring = {"key":"7c2f686dfaad","v":"3.0","limit":"1"}
+    result = requests.request("GET", url, params=querystring)
+    return result
 
-response = requests.request("GET", url, params=querystring)
 
-# Liste des series disponibles
+response = accueil()
 print(response.json())
 
-# Fonction d'ajout à sa liste : créer une api interne puis POST
+# tri des series par genre
+def serie_par_genre():
+    pass
 
+# tri des series par date
+def serie_par_date():
+    pass
 
-# Liste de série préférée : créer une api interne puis GET
+# tri des series par ordre alphabetique
+def serie_par_alphabet():
+    pass
 
+# affichage de la liste de serie preferee
+def serie_préférée():
+    pass
 
-# Résumés des épisodes précédents : GET la série en question et notamment ses épisodes et résumés (pas interne)
+# fiche synoptique d'une serie avec ses saisons et episodes
+def fiche_serie():
+    pass
 
+# connection a la base utilisateur
+def connection_base():
+    pass
 
-# Alerte de la prochaine diffusion : GET les épisodes des séries (interne) et les ranger dans un tableau,
-# Quand la date est moins d'une semaine, envoyer un message dans un panneau notif
+# inscription a la base utilisateur
+def inscription_base():
+    pass
 
+# notification serie preferee et recente
+def notification():
+    pass
