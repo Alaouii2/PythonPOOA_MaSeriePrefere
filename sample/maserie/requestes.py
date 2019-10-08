@@ -4,7 +4,7 @@
 from models import db
 import smtplib
 import requests
-from models import db, Client, Liste_serie_preferee
+from models import db, Client, Serie_disponible
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 
@@ -22,6 +22,20 @@ def serie_par_genre():
     querystring = {"key": "7c2f686dfaad", "v": "3.0", "limit": "2"}
     result = requests.request("GET", url, params=querystring)
     return result
+
+# tri des series par date
+# def serie_par_date():
+#     url = "https://api.betaseries.com/shows/list"
+#     querystring = {"key": "7c2f686dfaad", "v": "3.0", "limit": "2", "recent":True}
+#     result = requests.request("GET", url, params=querystring)
+#     return result # Pas trivial
+
+# tri des series par ordre alphabetique
+# def serie_par_alphabet():
+#     url = "https://api.betaseries.com/shows/list"
+#     querystring = {"key": "7c2f686dfaad", "v": "3.0", "limit": "2", "order":"alphabetical"}
+#     result = requests.request("GET", url, params=querystring)
+#     return result # Pas trivial
 
 
 # fiche synoptique d'une serie avec ses saisons et episodes
@@ -45,34 +59,20 @@ def recherche_serie(title):
 
 # inscription a la base utilisateur
 def inscription_base(adresse, mdp, user):
-    liste = Client.query.get()
-    if user not in liste.user and adresse not in liste.adresse:
-        db.session.add(Client(adresse, mdp, user))
-        db.session.commit()
-        return "Inscription complétée"
-    else:
-        return "Ce compte existe déjà"
-
-connected = False
+    db.session.add(Client(adresse, mdp, user))
+    db.session.commit()
 
 # connection a la base utilisateur
-def connection_base(mdp, adresse):
-    liste = Client.query.get()
-    if (mdp, adresse) in (liste.user, liste.adresse):
-        connected = True
-    else:
-        return "Désolé, mauvaise adresse ou mot de passe"
+def connection_base():
+    pass
 
 # affichage de la liste de serie preferee
-def serie_préférée(adresse):
-    series = Liste_serie_preferee.query.get(adresse)
-    return series
+def serie_préférée():
+    pass
 
 # ajout a la liste de serie préférée
-def ajout_préférée(serie, adresse):
-    series = Liste_serie_preferee.query.get(adresse)
-    db.session.add(Liste_serie_preferee(adresse, series))
-    db.session.commit()
+def ajout_préférée():
+
     pass
 
 # notification serie preferee et recente
@@ -89,28 +89,28 @@ def notification():
 
         if len(Liste_Notif) > 0:
             envoi_email(Client.email,Liste_Notif)
-
 def envoi_email(mail,liste):
 
     message = 'Ces episodes de vos series favorites vont bientot etre diffuses :\n\n'
     for notification in liste:
         message = message + notification['show_title'] + ' (episode ' + str(notification['episode_number']) + ') : le ' + \
                notification['air_date'].strftime('%d/%m/%Y')
+    try:
+        msg = MIMEMultipart()
+        msg['From'] = 'XXX@gmail.com'
+        msg['To'] = 'YYY@gmail.com'
+        msg['Subject'] = 'Tes series préférées'
+        msg.attach(MIMEText(message))
+        mailserver = smtplib.SMTP('smtp.gmail.com', 587)
+        mailserver.ehlo()
+        mailserver.starttls()
+        mailserver.ehlo()
+        mailserver.login('XXX@gmail.com', 'PASSWORD')
+        mailserver.sendmail('XXX@gmail.com', 'XXX@gmail.com', msg.as_string())
+        mailserver.quit()
+    except:
+        print('Impossible de  lui envoyer un mail')
 
-    msg = MIMEMultipart()
-    msg['From'] = 'XXX@gmail.com'
-    msg['To'] = 'YYY@gmail.com'
-    msg['Subject'] = 'Tes series préférées'
 
-    msg.attach(MIMEText(message))
-    mailserver = smtplib.SMTP('smtp.gmail.com', 587)
-    mailserver.ehlo()
-    mailserver.starttls()
-    mailserver.ehlo()
-    mailserver.login('XXX@gmail.com', 'PASSWORD')
-    mailserver.sendmail('XXX@gmail.com', 'XXX@gmail.com', msg.as_string())
-    mailserver.quit()
 
-    server = smtplib.SMTP_SSL('smtp.gmail.com', 500)
-    server.ehlo()
-    server.login('ouraorphe@gmail.com','55555555')
+
