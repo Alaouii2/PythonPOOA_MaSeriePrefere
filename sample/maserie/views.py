@@ -40,13 +40,13 @@ def series_categories():
 def serie(content_id):
     return render_template('serie.html')
 
-@app.route('/register/')
+@app.route('/about/')
+def about():
+    return render_template('about.html')
+
+
+@app.route("/register/", methods=["GET", "POST"])
 def register():
-    return render_template('register.html')
-
-
-@app.route("/enregistrer_client", methods=["GET", "POST"])
-def enregistrer_client():
 
     error = None
 
