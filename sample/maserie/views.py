@@ -6,6 +6,9 @@
 from flask import Flask, render_template , request , session , redirect ,url_for
 import requests
 import hashlib, uuid,os
+import sqlite3
+conn = sqlite3.connect('app.db')
+cursor=conn.cursor()
 # Crée l'application Flask
 app = Flask(__name__)
 
@@ -62,6 +65,7 @@ def enregistrer_client():
     if request.method == "POST":
 
         id_client= str(uuid.uuid4())
+        nom_utilisateur = request.form["Nom d'utilisateur"]
         adresse_mail = request.form["Email"]
         mdp = request.form["Password"]
         mdp2= request.form["Repeat Password"]
@@ -71,7 +75,7 @@ def enregistrer_client():
         """verifier si l'e-mail n'est pas deja utilisé par un client"""
 
         req_client_existant = "SELECT * FROM main.client WHERE adresse_mail = '%s' "
-        cursor.execute(req_client_existant % e_mail)
+        cursor.execute(req_client_existant % adresse_mail)
         resultat_req_client_existant = cursor.fetchall()
         print(resultat_req_client_existant)
 
@@ -86,22 +90,11 @@ def enregistrer_client():
 
         else:
 
-            req_enregister_client = "INSERT INTO main.client (id_client,adresse_mail,mdp)VALUES(%s,%s,%s,%s,%s,%s)"
-            cursor.execute(req_enregister_client,(id_client,adresse_mail,mdp))
-            connection.commit()
+            req_enregister_client = "INSERT INTO main.client (id_client,adresse_mail,mdp,nom_utilisateur)VALUES(%s,%s,%s,%s,%s,%s)"
+            cursor.execute(req_enregister_client,(id_client,adresse_mail,mdp,nom_utilisateur))
+            conn.commit()
 
-            session["e_mail"] = request.form["e_mail"]
-
-            """Inserer image par defaut"""
-
-            requete_inserer_image = "INSERT INTO Image (IdImage, Nom, IdClient) VALUES ('%s','%s','%s')"
-            id_image = str(uuid.uuid4())
-            nom = "default.jpg"
-            cursor.execute(requete_inserer_image % (id_image, nom, id_client))
-            connection.commit()
-
-
-            return redirect(url_for('mes_informations'))
+            return redirect(url_for('home'))
 
 
 
