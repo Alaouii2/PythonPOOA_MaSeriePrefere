@@ -3,7 +3,7 @@
     C'est le module gérant le front de notre application
 """
 
-from flask import Flask, render_template, url_for, request
+from flask import Flask, render_template
 import requests
 
 # Crée l'application Flask
@@ -11,6 +11,10 @@ app = Flask(__name__)
 
 # Charge les options de configuration
 app.config.from_object('config')
+
+#Classe de requete
+class Requete():
+    pass
 
 # Routage des pages
 

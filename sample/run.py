@@ -7,6 +7,12 @@
 
 from maserie import app
 
-# Lance l'application Flask depuis le fichier views
-if __name__ == "__main__":
-    app.run(debug=True)
+# Le runner de notre application
+class Runner():
+
+    # Lance l'application Flask depuis le fichier views
+    def __init__(self):
+        if __name__ == "__main__":
+            app.run(debug=True)
+
+runner = Runner()

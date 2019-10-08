@@ -23,20 +23,6 @@ def serie_par_genre():
     result = requests.request("GET", url, params=querystring)
     return result
 
-# tri des series par date
-# def serie_par_date():
-#     url = "https://api.betaseries.com/shows/list"
-#     querystring = {"key": "7c2f686dfaad", "v": "3.0", "limit": "2", "recent":True}
-#     result = requests.request("GET", url, params=querystring)
-#     return result # Pas trivial
-
-# tri des series par ordre alphabetique
-# def serie_par_alphabet():
-#     url = "https://api.betaseries.com/shows/list"
-#     querystring = {"key": "7c2f686dfaad", "v": "3.0", "limit": "2", "order":"alphabetical"}
-#     result = requests.request("GET", url, params=querystring)
-#     return result # Pas trivial
-
 
 # fiche synoptique d'une serie avec ses saisons et episodes
 def fiche_serie(id):
@@ -125,11 +111,6 @@ def envoi_email(mail,liste):
     mailserver.sendmail('XXX@gmail.com', 'XXX@gmail.com', msg.as_string())
     mailserver.quit()
 
-
-
-
     server = smtplib.SMTP_SSL('smtp.gmail.com', 500)
     server.ehlo()
     server.login('ouraorphe@gmail.com','55555555')
-
-print(accueil())
