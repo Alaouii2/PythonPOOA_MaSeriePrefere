@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="zxx">
 <head>
-	<title>EndGam - Gaming Magazine Template</title>
+	<title>Bienvenue sur ma série préférée</title>
 	<meta charset="UTF-8">
 	<meta name="description" content="EndGam Gaming Magazine Template">
 	<meta name="keywords" content="endGam,gGaming, magazine, html">
@@ -33,6 +33,32 @@
 </head>
 <body>
 
+	<!-- Page Preloder -->
+	<div id="preloder">
+		<div class="loader"></div>
+	</div>
+
+		<!-- Hero section -->
+	<section class="hero-section overflow-hidden">
+		<div class="hero-slider owl-carousel">
+			<div class="hero-item d-flex align-items-center justify-content-center text-center" style="background:url('/static/img/slider-bg-1.jpg');background-size:cover">
+				<div class="container">
+					<h2>Game on!</h2>
+					<p>Fusce erat dui, venenatis et erat in, vulputate dignissim lacus. Donec vitae tempus dolor,<br>sit amet elementum lorem. Ut cursus tempor turpis.</p>
+					<a href="#" class="site-btn">Read More  <img src="{{url_for('static', filename='img/icons/double-arrow.png')}}" alt="#"/></a>
+				</div>
+			</div>
+			<div class="hero-item d-flex align-items-center justify-content-center text-center" style="background:url('/static/img/slider-bg-2.jpg');background-size:cover">
+				<div class="container">
+					<h2>Game on!</h2>
+					<p>Fusce erat dui, venenatis et erat in, vulputate dignissim lacus. Donec vitae tempus dolor,<br>sit amet elementum lorem. Ut cursus tempor turpis.</p>
+					<a href="#" class="site-btn">Read More  <img src="{{url_for('static', filename='img/icons/double-arrow.png')}}" alt="#"/></a>
+				</div>
+			</div>
+		</div>
+	</section>
+	<!-- Hero section end-->
+
 	<!-- Header section -->
 	<section class="header">
 		<header class="header-section">
@@ -44,7 +70,32 @@
 					</a>
 					<nav class="top-nav-area w-100">
 						<div class="user-panel">
-							<a href="">Login</a> / <a href="">Register</a>
+							<button onclick="document.getElementById('id01').style.display='block'" style="width:auto;">Login</button> /
+							<div id="id01" class="modal">
+							  	<form class="modal-content animate" action="/action_page.php" method="post">
+									<div class="imgcontainer">
+								  		<span onclick="document.getElementById('id01').style.display='none'" class="close" title="Close Modal">&times;</span>
+									</div>
+								<div class="container">
+								  	<label for="uname"><b>Username</b></label>
+								 	<input type="text" placeholder="Enter Username" name="uname" required>
+
+									<label for="psw"><b>Password</b></label>
+								  	<input type="password" placeholder="Enter Password" name="psw" required>
+
+								  	<button type="submit">Login</button>
+								  	<label>
+									<input type="checkbox" checked="checked" name="remember"> Remember me
+								  	</label>
+								</div>
+
+								<div class="container" style="background-color:#f1f1f1">
+								  	<button type="button" onclick="document.getElementById('id01').style.display='none'" class="cancelbtn">Cancel</button>
+								 	<span class="psw">Forgot <a href="#">password?</a></span>
+								</div>
+							  	</form>
+							</div>
+							<a href="">Register</a>
 						</div>
 						<!-- Menu -->
 						<ul class="main-menu primary-menu">
@@ -67,24 +118,197 @@
 	</section>
 	<!-- Header section end -->
 
-	<!-- intro section -->
+	<!-- Intro section -->
 	<section class="intro-section">
 		<div class="container">
 			<div class="row">
-				{% for post in posts %}
 				<div class="col-md-4">
 					<div class="intro-text-box text-box text-white">
-						<div class="top-meta">11.11.18  /  in <a href="">Games</a></div>
-						<h3>The best online game is out now!</h3>
-						<p>{{ post.description }}</p>
+						<h3>Nouveautés !</h3>
+						<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Quis ipsum suspendisse ultrices gravida....</p>
 						<a href="#" class="read-more">Read More  <img src="{{ url_for('static', filename='img/icons/double-arrow.png')}}" alt="#"/></a>
 					</div>
 				</div>
-				{% endfor %}
+				<div class="col-md-4">
+					<div class="intro-text-box text-box text-white">
+						<h3>Top 5 séries 2019 !</h3>
+						<p>Ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Quis ipsum  labore suspendisse ultrices gravida....</p>
+						<a href="#" class="read-more">Read More  <img src="{{ url_for('static', filename='img/icons/double-arrow.png')}}" alt="#"/></a>
+					</div>
+				</div>
+				<div class="col-md-4">
+					<div class="intro-text-box text-box text-white">
+						<h3>Les séries les plus regardées !</h3>
+						<p>Sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Quis ipsum suspendisse ultrices gravida ncididunt ut labore ....</p>
+						<a href="#" class="read-more">Read More  <img src="{{ url_for('static', filename='img/icons/double-arrow.png')}}" alt="#"/></a>
+					</div>
+				</div>
 			</div>
 		</div>
 	</section>
 	<!-- Intro section end -->
+
+
+	<!-- Blog section -->
+	<section class="blog-section spad">
+		<div class="container">
+			<div class="row">
+				<div class="col-xl-9 col-lg-8 col-md-7">
+					<div class="section-title text-white">
+						<h2>Latest News</h2>
+					</div>
+					<ul class="blog-filter">
+						<li><a href="#">Racing</a></li>
+						<li><a href="#">Shooters</a></li>
+						<li><a href="#">Strategy</a></li>
+						<li><a href="#">Online</a></li>
+					</ul>
+					<!-- Blog item -->
+					<div class="blog-item">
+						<div class="blog-thumb">
+							<img src="{{ url_for('static', filename='img/blog/1.jpg')}}" alt="">
+						</div>
+						<div class="blog-text text-box text-white">
+							<div class="top-meta">11.11.18  /  in <a href="">Games</a></div>
+							<h3>The best online game is out now!</h3>
+							<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eius-mod tempor incididunt ut labore et dolore magna aliqua. Quis ipsum suspendisse ultrices gravida. Lorem ipsum dolor sit amet, consecte-tur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.....</p>
+							<a href="#" class="read-more">Read More  <img src="{{ url_for('static', filename='img/icons/double-arrow.png')}}" alt="#"/></a>
+						</div>
+					</div>
+					<!-- Blog item -->
+					<div class="blog-item">
+						<div class="blog-thumb">
+							<img src="{{ url_for('static', filename='img/blog/2.jpg')}}" alt="">
+						</div>
+						<div class="blog-text text-box text-white">
+							<div class="top-meta">11.11.18  /  in <a href="">Games</a></div>
+							<h3>The best online game is out now!</h3>
+							<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eius-mod tempor incididunt ut labore et dolore magna aliqua. Quis ipsum suspendisse ultrices gravida. Lorem ipsum dolor sit amet, consecte-tur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.....</p>
+							<a href="#" class="read-more">Read More  <img src="{{ url_for('static', filename='img/icons/double-arrow.png')}}" alt="#"/></a>
+						</div>
+					</div>
+					<!-- Blog item -->
+					<div class="blog-item">
+						<div class="blog-thumb">
+							<img src="{{ url_for('static', filename='img/blog/3.jpg')}}" alt="">
+						</div>
+						<div class="blog-text text-box text-white">
+							<div class="top-meta">11.11.18  /  in <a href="">Games</a></div>
+							<h3>The best online game is out now!</h3>
+							<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eius-mod tempor incididunt ut labore et dolore magna aliqua. Quis ipsum suspendisse ultrices gravida. Lorem ipsum dolor sit amet, consecte-tur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.....</p>
+							<a href="#" class="read-more">Read More  <img src="{{ url_for('static', filename='img/icons/double-arrow.png')}}" alt="#"/></a>
+						</div>
+					</div>
+				</div>
+				<div class="col-xl-3 col-lg-4 col-md-5 sidebar">
+					<div id="stickySidebar">
+						<div class="widget-item">
+							<h4 class="widget-title">Trending</h4>
+							<div class="trending-widget">
+								<div class="tw-item">
+									<div class="tw-thumb">
+										<img src="{{ url_for('static', filename='img/blog-widget/1.jpg')}}" alt="#">
+									</div>
+									<div class="tw-text">
+										<div class="tw-meta">11.11.18  /  in <a href="">Games</a></div>
+										<h5>The best online game is out now!</h5>
+									</div>
+								</div>
+								<div class="tw-item">
+									<div class="tw-thumb">
+										<img src="{{ url_for('static', filename='img/blog-widget/2.jpg')}}" alt="#">
+									</div>
+									<div class="tw-text">
+										<div class="tw-meta">11.11.18  /  in <a href="">Games</a></div>
+										<h5>The best online game is out now!</h5>
+									</div>
+								</div>
+								<div class="tw-item">
+									<div class="tw-thumb">
+										<img src="{{ url_for('static', filename='img/blog-widget/3.jpg')}}" alt="#">
+									</div>
+									<div class="tw-text">
+										<div class="tw-meta">11.11.18  /  in <a href="">Games</a></div>
+										<h5>The best online game is out now!</h5>
+									</div>
+								</div>
+								<div class="tw-item">
+									<div class="tw-thumb">
+										<img src="{{ url_for('static', filename='img/blog-widget/4.jpg')}}" alt="#">
+									</div>
+									<div class="tw-text">
+										<div class="tw-meta">11.11.18  /  in <a href="">Games</a></div>
+										<h5>The best online game is out now!</h5>
+									</div>
+								</div>
+							</div>
+						</div>
+						<div class="widget-item">
+							<div class="categories-widget">
+								<h4 class="widget-title">categories</h4>
+								<ul>
+									<li><a href="">Games</a></li>
+									<li><a href="">Gaming Tips & Tricks</a></li>
+									<li><a href="">Online Games</a></li>
+									<li><a href="">Team Games</a></li>
+									<li><a href="">Community</a></li>
+									<li><a href="">Uncategorized</a></li>
+								</ul>
+							</div>
+						</div>
+						<div class="widget-item">
+						<a href="#" class="add">
+							<img src="{{ url_for('static', filename='img/add.jpg')}}" alt="">
+						</a>
+					</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</section>
+	<!-- Blog section end -->
+
+
+	<!-- Promo section -->
+	<section class="intro-video-section d-flex align-items-end" style="background:url('/static/img/promo-bg.jpg'); background-size: cover;")>
+		<a href="https://www.youtube.com/watch?v=uFsGy5x_fyQ" class="video-play-btn video-popup"><img src="{{ url_for('static', filename='img/icons/solid-right-arrow.png')}}" alt="#"></a>
+		<div class="container">
+			<div class="video-text">
+				<h2>Promo video of the game</h2>
+				<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt.</p>
+			</div>
+		</div>
+	</section>
+	<!-- Promo section end -->
+
+
+	<!-- Featured section -->
+	<section class="featured-section">
+		<div class="featured-bg" style="background: url('/static/img/featured-bg.jpg');background-size:cover"></div>
+		<div class="featured-box">
+			<div class="text-box">
+				<div class="top-meta">11.11.18  /  in <a href="">Games</a></div>
+				<h3>The game you’ve been waiting  for is out now</h3>
+				<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Quis ipsum suspendisse ultrices gravida. Ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliquamet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Vestibulum posuere porttitor justo id pellentesque. Proin id lacus feugiat, posuere erat sit amet, commodo ipsum. Donec pellentesque vestibulum metus...</p>
+				<a href="#" class="read-more">Read More  <img src="{{ url_for('static', filename='img/icons/double-arrow.png')}}" alt="#"/></a>
+			</div>
+		</div>
+	</section>
+	<!-- Featured section end-->
+
+
+
+	<!-- Newsletter section -->
+	<section class="newsletter-section">
+		<div class="container">
+			<h2>Subscribe to our newsletter</h2>
+			<form class="newsletter-form">
+				<input type="text" placeholder="ENTER YOUR E-MAIL">
+				<button class="site-btn">subscribe  <img src="{{ url_for('static', filename='img/icons/double-arrow.png')}}" alt="#"/></button>
+			</form>
+		</div>
+	</section>
+	<!-- Newsletter section end -->
 
 
 	<!-- Footer section -->
@@ -120,7 +344,18 @@
 	<script src="{{ url_for('static', filename='js/owl.carousel.min.js')}}"></script>
 	<script src="{{ url_for('static', filename='js/jquery.sticky-sidebar.min.js')}}"></script>
 	<script src="{{ url_for('static', filename='js/jquery.magnific-popup.min.js')}}"></script>
-	<script src="js/main.js"></script>
+	<script src="{{ url_for('static', filename='js/main.js')}}"></script>
+	<script>
+	// Get the modal
+	var modal = document.getElementById('id01');
+
+	// When the user clicks anywhere outside of the modal, close it
+	window.onclick = function(event) {
+		if (event.target == modal) {
+			modal.style.display = "none";
+		}
+	}
+	</script>
 
 	</body>
 </html>

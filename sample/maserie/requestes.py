@@ -5,6 +5,8 @@ from models import db
 import smtplib
 import requests
 from models import db, Client, Liste_serie_preferee
+from email.mime.multipart import MIMEMultipart
+from email.mime.text import MIMEText
 
 # Page d'accueil
 def accueil():
@@ -103,6 +105,29 @@ def notification():
             envoi_email(Client.email,Liste_Notif)
 
 def envoi_email(mail,liste):
+
+    message = 'Ces episodes de vos series favorites vont bientot etre diffuses :\n\n'
+    for notification in liste:
+        message = message + notification['show_title'] + ' (episode ' + str(notification['episode_number']) + ') : le ' + \
+               notification['air_date'].strftime('%d/%m/%Y')
+
+    msg = MIMEMultipart()
+    msg['From'] = 'XXX@gmail.com'
+    msg['To'] = 'YYY@gmail.com'
+    msg['Subject'] = 'Tes series préférées'
+
+    msg.attach(MIMEText(message))
+    mailserver = smtplib.SMTP('smtp.gmail.com', 587)
+    mailserver.ehlo()
+    mailserver.starttls()
+    mailserver.ehlo()
+    mailserver.login('XXX@gmail.com', 'PASSWORD')
+    mailserver.sendmail('XXX@gmail.com', 'XXX@gmail.com', msg.as_string())
+    mailserver.quit()
+
+
+
+
     server = smtplib.SMTP_SSL('smtp.gmail.com', 500)
     server.ehlo()
     server.login('ouraorphe@gmail.com','55555555')
