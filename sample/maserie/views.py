@@ -26,21 +26,21 @@ def home():
     posts = requests.request("GET", url, params=querystring).json()["shows"]
     return render_template('home.html', posts=posts)
 
-@app.route('/series/')
-def series():
-    return render_template('series.html')
+@app.route('/series_alphabet/')
+def series_alphabet():
+    return render_template('series_alphabet.html')
 
 @app.route('/about/')
 def about():
     return render_template('about.html')
 
-@app.route('/contact/')
-def contact():
-    return render_template('contact.html')
+@app.route('/series_categories/')
+def series_categories():
+    return render_template('series_categories.html')
 
-@app.route('/game-single/')
-def gamesingle():
-    return render_template('game-single.html')
+@app.route('/serie/')
+def serie(content_id):
+    return render_template('serie.html')
 
 @app.route('/register/')
 def register():
