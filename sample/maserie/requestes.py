@@ -4,7 +4,7 @@
 from models import db
 import smtplib
 import requests
-from models import db, Client, Serie_disponible
+from models import db, Client, Liste_serie_preferee
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 
@@ -22,20 +22,6 @@ def serie_par_genre():
     querystring = {"key": "7c2f686dfaad", "v": "3.0", "limit": "2"}
     result = requests.request("GET", url, params=querystring)
     return result
-
-# tri des series par date
-# def serie_par_date():
-#     url = "https://api.betaseries.com/shows/list"
-#     querystring = {"key": "7c2f686dfaad", "v": "3.0", "limit": "2", "recent":True}
-#     result = requests.request("GET", url, params=querystring)
-#     return result # Pas trivial
-
-# tri des series par ordre alphabetique
-# def serie_par_alphabet():
-#     url = "https://api.betaseries.com/shows/list"
-#     querystring = {"key": "7c2f686dfaad", "v": "3.0", "limit": "2", "order":"alphabetical"}
-#     result = requests.request("GET", url, params=querystring)
-#     return result # Pas trivial
 
 
 # fiche synoptique d'une serie avec ses saisons et episodes
@@ -59,19 +45,34 @@ def recherche_serie(title):
 
 # inscription a la base utilisateur
 def inscription_base(adresse, mdp, user):
-    db.session.add(Client(adresse, mdp, user))
-    db.session.commit()
+    liste = Client.query.get()
+    if user not in liste.user and adresse not in liste.adresse:
+        db.session.add(Client(adresse, mdp, user))
+        db.session.commit()
+        return "Inscription complétée"
+    else:
+        return "Ce compte existe déjà"
+
+connected = False
 
 # connection a la base utilisateur
-def connection_base():
-    pass
+def connection_base(mdp, adresse):
+    liste = Client.query.get()
+    if (mdp, adresse) in (liste.user, liste.adresse):
+        connected = True
+    else:
+        return "Désolé, mauvaise adresse ou mot de passe"
 
 # affichage de la liste de serie preferee
-def serie_préférée():
-    pass
+def serie_préférée(adresse):
+    series = Liste_serie_preferee.query.get(adresse)
+    return series
 
 # ajout a la liste de serie préférée
-def ajout_préférée():
+def ajout_préférée(serie, adresse):
+    series = Liste_serie_preferee.query.get(adresse)
+    db.session.add(Liste_serie_preferee(adresse, series))
+    db.session.commit()
     pass
 
 # notification serie preferee et recente
@@ -88,6 +89,7 @@ def notification():
 
         if len(Liste_Notif) > 0:
             envoi_email(Client.email,Liste_Notif)
+
 def envoi_email(mail,liste):
 
     message = 'Ces episodes de vos series favorites vont bientot etre diffuses :\n\n'
@@ -109,5 +111,6 @@ def envoi_email(mail,liste):
     mailserver.sendmail('XXX@gmail.com', 'XXX@gmail.com', msg.as_string())
     mailserver.quit()
 
-
-
+    server = smtplib.SMTP_SSL('smtp.gmail.com', 500)
+    server.ehlo()
+    server.login('ouraorphe@gmail.com','55555555')

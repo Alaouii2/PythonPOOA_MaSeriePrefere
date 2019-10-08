@@ -1,15 +1,30 @@
-from flask import Flask, render_template, url_for, request
+"""
+    Mesdames et messieurs, veuillez vous lever pour views !
+    C'est le module gérant le front de notre application
+"""
 
+from flask import Flask, render_template
+import requests
+
+# Crée l'application Flask
 app = Flask(__name__)
 
-# Config options - Make sure you created a 'config.py' file.
+# Charge les options de configuration
 app.config.from_object('config')
-# To get one variable, tape app.config['MY_VARIABLE']
+
+#Classe de requete
+class Requete():
+    pass
+
+# Routage des pages
 
 @app.route('/')
 @app.route('/home/')
 def home():
-    return render_template('home.html')
+    url = "https://api.betaseries.com/shows/list"
+    querystring = {"key":"7c2f686dfaad","v":"3.0","limit":"3"}
+    posts = requests.request("GET", url, params=querystring).json()["shows"]
+    return render_template('home.html', posts=posts)
 
 @app.route('/series/')
 def series():
