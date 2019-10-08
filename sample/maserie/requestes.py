@@ -4,7 +4,7 @@
 from models import db
 import smtplib
 import requests
-from models import db, Client, Serie_disponible
+from models import db, Client, Liste_serie_preferee
 
 # Page d'accueil
 def accueil():
@@ -57,19 +57,34 @@ def recherche_serie(title):
 
 # inscription a la base utilisateur
 def inscription_base(adresse, mdp, user):
-    db.session.add(Client(adresse, mdp, user))
-    db.session.commit()
+    liste = Client.query.get()
+    if user not in liste.user and adresse not in liste.adresse:
+        db.session.add(Client(adresse, mdp, user))
+        db.session.commit()
+        return "Inscription complétée"
+    else:
+        return "Ce compte existe déjà"
+
+connected = False
 
 # connection a la base utilisateur
-def connection_base():
-    pass
+def connection_base(mdp, adresse):
+    liste = Client.query.get()
+    if (mdp, adresse) in (liste.user, liste.adresse):
+        connected = True
+    else:
+        return "Désolé, mauvaise adresse ou mot de passe"
 
 # affichage de la liste de serie preferee
-def serie_préférée():
-    pass
+def serie_préférée(adresse):
+    series = Liste_serie_preferee.query.get(adresse)
+    return series
 
 # ajout a la liste de serie préférée
-def ajout_préférée():
+def ajout_préférée(serie, adresse):
+    series = Liste_serie_preferee.query.get(adresse)
+    db.session.add(Liste_serie_preferee(adresse, series))
+    db.session.commit()
     pass
 
 # notification serie preferee et recente
@@ -86,23 +101,10 @@ def notification():
 
         if len(Liste_Notif) > 0:
             envoi_email(Client.email,Liste_Notif)
+
 def envoi_email(mail,liste):
     server = smtplib.SMTP_SSL('smtp.gmail.com', 500)
     server.ehlo()
     server.login('ouraorphe@gmail.com','55555555')
 
-
-
-
-
-
-    pass
-
-
-
-
-
-
-
-    pass
-
+print(accueil())
