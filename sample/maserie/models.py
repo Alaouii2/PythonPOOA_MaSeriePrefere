@@ -1,16 +1,16 @@
 """
     Je suis actuellement le commentaire le plus inutile du monde, quel modele !
-    Mais en vrai vous allez voir ca va etre open fun ce module, j'espère que vous allez apprécier !
+    C'est le module gérant la base de donnée de notre application
 """
 
 from flask_sqlalchemy import SQLAlchemy
 from .views import app
 import datetime
 
-# Create database connection object
+# Crée l'objet de connection à la base de donnée
 db = SQLAlchemy(app)
 
-
+# Objet Client
 class Client(db.Model):
 
     id_client = db.Column(db.Integer, primary_key=True)
@@ -23,54 +23,54 @@ class Client(db.Model):
         self.mdp = mdp
         self.nom_utilisateur = nom_utilisateur
 
+# # Objet Séries
+# class Serie_disponible(db.Model):
+#
+#     id_serie = db.Column(db.Integer, primary_key=True)
+#     titre_serie = db.Column(db.String(100), nullable=False)
+#     descriptif_serie = db.Column(db.String(1000), nullable=True)
+#     nb_saison = db.Column(db.Integer, nullable=False)
+#     genre = db.Column(db.String(100), nullable=False)
+#     annee_production = db.Column(db.DateTime, nullable=False)
+#     realisateur = db.Column(db.String(100), nullable=False)
+#
+#     def __init__(self, titre_serie, descriptif_serie, nb_saison, genre, annee_production, realisateur):
+#         self.titre_serie = titre_serie
+#         self.descriptif_serie = descriptif_serie
+#         self.nb_saison = nb_saison
+#         self.genre = genre
+#         self.annee_production = annee_production
+#         self.realisateur = realisateur
+#
+#
+# class Saison(db.Model):
+#
+#     id_saison = db.Column(db.Integer, primary_key=True)
+#     id_serie = db.Column(db.Integer, db.ForeignKey(Serie_disponible.id_serie))
+#     n_saison = db.Column(db.Integer, nullable=False)
+#     n_episode = db.Column(db.Integer, nullable=False)
+#
+#     def __init__(self, id_serie, n_saison, n_episode):
+#         self.id_serie = id_serie
+#         self.n_saison = n_saison
+#         self.n_episode = n_episode
+#
+#
+# class Episode(db.Model):
+#
+#     id_episode = db.Column(db.Integer, primary_key=True)
+#     id_saison = db.Column(db.Integer, db.ForeignKey(Saison.id_saison))
+#     descriptif_episode = db.Column(db.String(1000), nullable=True)
+#     duree_episode = db.Column(db.DateTime, nullable=False)
+#     numero_episode = db.Column(db.Integer, nullable=False)
+#
+#     def __init__(self, id_saison, descriptif_episode, duree_episode, numero_episode):
+#         self.id_saison = id_saison
+#         self.descriptif_episode = descriptif_episode
+#         self.duree_episode = duree_episode
+#         self.numero_episode = numero_episode
 
-class Serie_disponible(db.Model):
-
-    id_serie = db.Column(db.Integer, primary_key=True)
-    titre_serie = db.Column(db.String(100), nullable=False)
-    descriptif_serie = db.Column(db.String(1000), nullable=True)
-    nb_saison = db.Column(db.Integer, nullable=False)
-    genre = db.Column(db.String(100), nullable=False)
-    annee_production = db.Column(db.DateTime, nullable=False)
-    realisateur = db.Column(db.String(100), nullable=False)
-
-    def __init__(self, titre_serie, descriptif_serie, nb_saison, genre, annee_production, realisateur):
-        self.titre_serie = titre_serie
-        self.descriptif_serie = descriptif_serie
-        self.nb_saison = nb_saison
-        self.genre = genre
-        self.annee_production = annee_production
-        self.realisateur = realisateur
-
-
-class Saison(db.Model):
-
-    id_saison = db.Column(db.Integer, primary_key=True)
-    id_serie = db.Column(db.Integer, db.ForeignKey(Serie_disponible.id_serie))
-    n_saison = db.Column(db.Integer, nullable=False)
-    n_episode = db.Column(db.Integer, nullable=False)
-
-    def __init__(self, id_serie, n_saison, n_episode):
-        self.id_serie = id_serie
-        self.n_saison = n_saison
-        self.n_episode = n_episode
-
-
-class Episode(db.Model):
-
-    id_episode = db.Column(db.Integer, primary_key=True)
-    id_saison = db.Column(db.Integer, db.ForeignKey(Saison.id_saison))
-    descriptif_episode = db.Column(db.String(1000), nullable=True)
-    duree_episode = db.Column(db.DateTime, nullable=False)
-    numero_episode = db.Column(db.Integer, nullable=False)
-
-    def __init__(self, id_saison, descriptif_episode, duree_episode, numero_episode):
-        self.id_saison = id_saison
-        self.descriptif_episode = descriptif_episode
-        self.duree_episode = duree_episode
-        self.numero_episode = numero_episode
-
-
+# Objet liste de séries préférées, par utilisateur
 class Liste_serie_preferee(db.Model):
 
     id_liste = db.Column(db.Integer, primary_key=True)

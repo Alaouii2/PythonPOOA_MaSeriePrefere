@@ -1,13 +1,18 @@
+"""
+    Mesdames et messieurs, veuillez vous lever pour views !
+    C'est le module gérant le front de notre application
+"""
+
 from flask import Flask, render_template, url_for, request
 import requests
 
+# Crée l'application Flask
 app = Flask(__name__)
 
-# Config options - Make sure you created a 'config.py' file.
+# Charge les options de configuration
 app.config.from_object('config')
-# To get one variable, tape app.config['MY_VARIABLE']
 
-#from .utils import find_content, OpenGraphImage
+# Routage des pages
 
 @app.route('/')
 @app.route('/home/')
