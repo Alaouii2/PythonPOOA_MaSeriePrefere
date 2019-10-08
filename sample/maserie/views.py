@@ -30,10 +30,6 @@ def home():
 def series_alphabet():
     return render_template('series_alphabet.html')
 
-@app.route('/about/')
-def about():
-    return render_template('about.html')
-
 @app.route('/series_categories/')
 def series_categories():
     return render_template('series_categories.html')
@@ -45,6 +41,10 @@ def serie(content_id):
 @app.route('/register/')
 def register():
     return render_template('register.html')
+
+@app.route('/about/')
+def about():
+    return render_template('about.html')
 
 # @app.route('/contents/<int:content_id>/')
 # def content(content_id):
