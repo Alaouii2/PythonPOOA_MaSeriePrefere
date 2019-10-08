@@ -27,6 +27,10 @@ def contact():
 def gamesingle():
     return render_template('game-single.html')
 
+@app.route('/register/')
+def register():
+    return render_template('register.html')
+
 # @app.route('/contents/<int:content_id>/')
 # def content(content_id):
 #     return '%s' % content_id
