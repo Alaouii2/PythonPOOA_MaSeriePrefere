@@ -32,9 +32,19 @@ def home():
     posts = requests.request("GET", url, params=querystring).json()["shows"]
     return render_template('home.html', posts=posts)
 
+@app.route('/my_list/')
+def my_list():
+    url = "https://api.betaseries.com/shows/random"
+    querystring = {"key":"7c2f686dfaad","v":"3.0","nb":"3"}
+    posts = requests.request("GET", url, params=querystring).json()["shows"]
+    return render_template('my_list.html', posts=posts)
+
 @app.route('/series_alphabet/')
 def series_alphabet():
-    return render_template('series_alphabet.html')
+    url = "https://api.betaseries.com/shows/random"
+    querystring = {"key": "7c2f686dfaad", "v": "3.0", "nb": "9"}
+    posts = requests.request("GET", url, params=querystring).json()["shows"]
+    return render_template('series_alphabet.html', posts=posts)
 
 @app.route('/series_categories/')
 def series_categories():

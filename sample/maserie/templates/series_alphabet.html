@@ -74,13 +74,9 @@
 						<!-- Menu -->
 						<ul class="main-menu primary-menu">
 							<li><a href="{{ url_for('home')}}">Home</a></li>
-							<li><a href="{{ url_for('series_alphabet')}}">Séries</a>
-								<ul class="sub-menu">
-									<li><a href="{{ url_for('series_alphabet')}}">Alphabétique</a></li>
-									<li><a href="{{ url_for('series_categories')}}">Catégories</a></li>
-								</ul>
-							</li>
+							<li><a href="{{ url_for('series_alphabet')}}">Séries</a></li>
 							<li><a href="{{ url_for('about')}}">About</a></li>
+							<li><a href="{{ url_for('my_list')}}">My List</a></li>
 						</ul>
 					</nav>
 				</div>
@@ -125,69 +121,17 @@
 			<div class="row">
 				<div class="col-xl-7 col-lg-8 col-md-7">
 					<div class="row">
+						{% for post in posts %}
 						<div class="col-lg-4 col-md-6">
 							<div class="game-item">
-								<img src="{{url_for('static', filename='img/games/1.jpg')}}" alt="#">
-								<h5>Zombie Appocalipse 2</h5>
-								<a href="{{url_for('serie')}}" class="read-more">Read More  <img src="{{url_for('static', filename='img/icons/double-arrow.png')}}" alt="#"/></a>
+								<a href="{{ url_for('serie')}}" class="read-more">
+									<img src={{ post.images.show }} alt="#"/>
+								</a>
+								<h5>{{ post.title }}</h5>
+								<a href="{{ url_for('serie')}}" class="read-more">Read More  <img src="{{ url_for('static', filename='img/icons/double-arrow.png')}}" alt="#"/></a>
 							</div>
 						</div>
-						<div class="col-lg-4 col-md-6">
-							<div class="game-item">
-								<img src="{{url_for('static', filename='img/games/2.jpg')}}" alt="#">
-								<h5>Dooms Day</h5>
-								<a href="{{url_for('serie')}}" class="read-more">Read More  <img src="{{url_for('static', filename='img/icons/double-arrow.png')}}" alt="#"/></a>
-							</div>
-						</div>
-						<div class="col-lg-4 col-md-6">
-							<div class="game-item">
-								<img src="{{url_for('static', filename='img/games/3.jpg')}}" alt="#">
-								<h5>The Huricane</h5>
-								<a href="{{url_for('serie')}}" class="read-more">Read More  <img src="{{url_for('static', filename='img/icons/double-arrow.png')}}" alt="#"/></a>
-							</div>
-						</div>
-						<div class="col-lg-4 col-md-6">
-							<div class="game-item">
-								<img src="{{url_for('static', filename='img/games/4.jpg')}}" alt="#">
-								<h5>Star Wars</h5>
-								<a href="{{url_for('serie')}}" class="read-more">Read More  <img src="{{url_for('static', filename='img/icons/double-arrow.png')}}" alt="#"/></a>
-							</div>
-						</div>
-						<div class="col-lg-4 col-md-6">
-							<div class="game-item">
-								<img src="{{url_for('static', filename='img/games/5.jpg')}}" alt="#">
-								<h5>Candy land</h5>
-								<a href="{{url_for('serie')}}" class="read-more">Read More  <img src="{{url_for('static', filename='img/icons/double-arrow.png')}}" alt="#"/></a>
-							</div>
-						</div>
-						<div class="col-lg-4 col-md-6">
-							<div class="game-item">
-								<img src="{{url_for('static', filename='img/games/6.jpg')}}" alt="#">
-								<h5>E.T.</h5>
-								<a href="{{url_for('serie')}}" class="read-more">Read More  <img src="{{url_for('static', filename='img/icons/double-arrow.png')}}" alt="#"/></a>
-							</div>
-						</div>
-						<div class="col-lg-4 col-md-6">
-							<div class="game-item">
-								<img src="{{url_for('static', filename='img/games/7.jpg')}}" alt="#">
-								<h5>Zombie Appocalipse 2</h5>
-								<a href="{{url_for('serie')}}" class="read-more">Read More  <img src="{{url_for('static', filename='img/icons/double-arrow.png')}}" alt="#"/></a>
-							</div>
-						</div>
-						<div class="col-lg-4 col-md-6">
-							<div class="game-item">
-								<img src="{{url_for('static', filename='img/games/8.jpg')}}" alt="#">
-								<h5>Dooms Day</h5>
-								<a href="{{url_for('serie')}}" class="read-more">Read More  <img src="{{url_for('static', filename='img/icons/double-arrow.png')}}" alt="#"/></a>
-							</div>
-						</div>
-						<div class="col-lg-4 col-md-6">
-							<div class="game-item">
-								<img src="{{url_for('static', filename='img/games/9.jpg')}}" alt="#">
-								<h5>The Huricane</h5>
-								<a href="{{url_for('serie')}}" class="read-more">Read More  <img src="{{url_for('static', filename='img/icons/double-arrow.png')}}" alt="#"/></a>
-							</div>
-						</div>
+						{% endfor %}
 					</div>
 					<div class="site-pagination">
 						<a href="#" class="active">01.</a>
@@ -199,40 +143,14 @@
 					<div id="stickySidebar">
 						<div class="widget-item">
 							<div class="categories-widget">
-								<h4 class="widget-title">categories</h4>
-								<ul>
-									<li><a href="">Games</a></li>
-									<li><a href="">Gaming Tips & Tricks</a></li>
-									<li><a href="">Online Games</a></li>
-									<li><a href="">Team Games</a></li>
-									<li><a href="">Community</a></li>
-									<li><a href="">Uncategorized</a></li>
-								</ul>
-							</div>
-						</div>
-						<div class="widget-item">
-							<div class="categories-widget">
-								<h4 class="widget-title">platform</h4>
-								<ul>
-									<li><a href="">Xbox</a></li>
-									<li><a href="">X box 360</a></li>
-									<li><a href="">Play Station</a></li>
-									<li><a href="">Play Station VR</a></li>
-									<li><a href="">Nintendo Wii</a></li>
-									<li><a href="">Nintendo Wii U</a></li>
-								</ul>
-							</div>
-						</div>
-						<div class="widget-item">
-							<div class="categories-widget">
 								<h4 class="widget-title">Genre</h4>
 								<ul>
-									<li><a href="">Online</a></li>
-									<li><a href="">Adventure</a></li>
-									<li><a href="">S.F.</a></li>
-									<li><a href="">Strategy</a></li>
-									<li><a href="">Racing</a></li>
-									<li><a href="">Shooter</a></li>
+									<li><a href="">Drame</a></li>
+									<li><a href="">Comédie</a></li>
+									<li><a href="">Mystère</a></li>
+									<li><a href="">Enfants</a></li>
+									<li><a href="">Télé-réalité</a></li>
+									<li><a href="">Mini-série</a></li>
 								</ul>
 							</div>
 						</div>
