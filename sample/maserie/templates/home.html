@@ -6,6 +6,7 @@
 	<meta name="description" content="EndGam Gaming Magazine Template">
 	<meta name="keywords" content="endGam,gGaming, magazine, html">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
 	<!-- Favicon -->
 	<link href="{{ url_for('static', filename='img/favicon.ico')}}" rel="shortcut icon"/>
 
@@ -60,6 +61,7 @@
 						<img src="{{ url_for('static', filename='img/logo.png')}}" alt="">
 					</a>
 					<nav class="top-nav-area w-100">
+						<!-- connection section -->
 						<div class="user-panel">
 							<button onclick="document.getElementById('id01').style.display='block'" style="width:auto">Login</button> /
 							<div id="id01" class="modal">
@@ -105,6 +107,9 @@
 
 	<!-- Intro section -->
 	<section class="intro-section">
+		<div class="container text-white">
+			<h1>Séries du moment</h1>
+		</div>
 		<div class="container">
 			<div class="row">
 				{% for post in posts %}
@@ -126,7 +131,7 @@
 	<!-- Footer section -->
 	<footer class="footer-section">
 		<div class="container">
-			<a href="#" class="footer-logo">
+			<a href="{{ url_for('home')}}" class="footer-logo">
 				<img src="{{ url_for('static', filename='img/logo.png')}}" alt="">
 			</a>
 			<div class="copyright"><a href="">Colorlib</a> 2019 @ All rights reserved</div>

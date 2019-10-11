@@ -371,7 +371,7 @@ ol {
 
 .main-menu li a:after {
 	position: absolute;
-	content: "";
+	/*content: "";*/
 	width: 20px;
 	height: 20px;
 	right: 0;
@@ -1098,7 +1098,7 @@ ol {
 -----------------*/
 
 .games-section {
-	padding: 108px 0;
+	padding: 208px 0;
 	/* Permalink - use to edit and share this gradient: http://colorzilla.com/gradient-editor/#501755+0,2d1854+100 */
 	background: #501755;
 	/* Old browsers */
@@ -1219,7 +1219,7 @@ ol {
 .review-section,
 .blog-page,
 .contact-page {
-	padding: 104px 0;
+	padding: 204px 0;
 	/* Permalink - use to edit and share this gradient: http://colorzilla.com/gradient-editor/#501755+0,2d1854+100 */
 	background: #501755;
 	/* Old browsers */

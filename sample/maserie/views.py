@@ -23,11 +23,12 @@ class Requete():
 
 ## from .utils import find_content, OpenGraphImage
 
+# La page d'accueil. Affiche trois séries au hasard.
 @app.route('/')
 @app.route('/home/')
 def home():
-    url = "https://api.betaseries.com/shows/list"
-    querystring = {"key":"7c2f686dfaad","v":"3.0","limit":"3"}
+    url = "https://api.betaseries.com/shows/random"
+    querystring = {"key":"7c2f686dfaad","v":"3.0","nb":"3"}
     posts = requests.request("GET", url, params=querystring).json()["shows"]
     return render_template('home.html', posts=posts)
 
@@ -40,7 +41,7 @@ def series_categories():
     return render_template('series_categories.html')
 
 @app.route('/serie/')
-def serie(content_id):
+def serie():
     return render_template('serie.html')
 
 @app.route('/about/')
