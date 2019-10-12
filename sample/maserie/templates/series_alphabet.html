@@ -131,7 +131,11 @@
 									<img src={{ post.images.show }} alt="#"/>
 								</a>
 								<h5>{{ post.title }}</h5>
-								<a href="{{ url_for('serie')}}" class="read-more">Read More  <img src="{{ url_for('static', filename='img/icons/double-arrow.png')}}" alt="#"/></a>
+								<a href="{{ url_for('serie')}}" class="read-more">
+									Read More
+									<img src="{{ url_for('static', filename='img/icons/double-arrow.png')}}" alt="#"/>
+								</a>
+								<button type="site-btn">Add</button>
 							</div>
 						</div>
 						{% endfor %}
