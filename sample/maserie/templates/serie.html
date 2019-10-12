@@ -77,10 +77,10 @@
 						</div>
 						<!-- Menu -->
 						<ul class="main-menu primary-menu">
-							<li><a href="{{ url_for('home')}}">Home</a></li>
+							<li><a href="{{ url_for('home')}}">Accueil</a></li>
 							<li><a href="{{ url_for('series_alphabet')}}">Séries</a></li>
-							<li><a href="{{ url_for('about')}}">About</a></li>
-							<li><a href="{{ url_for('my_list')}}">My List</a></li>
+							<li><a href="{{ url_for('about')}}">À Propos</a></li>
+							<li><a href="{{ url_for('my_list')}}">Ma Liste</a></li>
 						</ul>
 					</nav>
 				</div>
@@ -105,6 +105,13 @@
 					<h4>Conclusion</h4>
 					<p>Nulla ut maximus mauris. Sed malesuada at sapien sed euismod. Vestibulum pharetra in sem id laoreet. Cras metus ex, placerat nec justo quis, luctus posuere ex. Vivamus volutpat nibh ac sollicitudin imperdiet. Donec scelerisque lorem sodales odio ultricies, nec rhoncus ex lobortis. Vivamus tincidunt sit amet sem id varius. Donec ele-mentum aliquet tortor. Curabitur justo mi, efficitur sed eros aliquet, dictum molestie eros. Nullam scelerisque convallis gravida. Morbi id lorem accumsan, scelerisque enim laoreet, sollicitudin neque. Vivamus volutpat nibh ac sollicitudin imperdiet. Donec scelerisque lorem sodales odio ultricies, nec rhoncus ex lobortis. Vivamus tincidunt sit amet sem id varius. Donec ele-mentum aliquet tortor. Curabitur justo mi, efficitur sed eros aliqueDonec vitae tellus sodales, congue augue at, biben-dum justo. Pellentesque non dolor et magna volutpat pharetra eget vel ligula. Maecenas facilisis vestibulum mattis. Sed sagittis gravida urna. Cras nec mi risus.
 					</p>
+					<h4>Open Fun</h4>
+					{% for episode in episodes.episodes %}
+						<p>{{ episode.title }}</p>
+						<p>{{ episode.season }}</p>
+						<p>{{ episode.episode }}</p>
+						<p>{{ episode.description }}</p>
+					{% endfor %}
 				</div>
 				<div class="col-xl-3 col-lg-4 col-md-5 sidebar game-page-sideber">
 					<div id="stickySidebar">

@@ -30,6 +30,9 @@ def home():
     url = "https://api.betaseries.com/shows/random"
     querystring = {"key":"7c2f686dfaad","v":"3.0","nb":"3"}
     posts = requests.request("GET", url, params=querystring).json()["shows"]
+    for post in posts:
+        if len(post["description"]) > 500:
+            post["description"] = post["description"][:500] + "..."
     return render_template('home.html', posts=posts)
 
 @app.route('/my_list/')
@@ -52,7 +55,14 @@ def series_categories():
 
 @app.route('/serie/')
 def serie():
-    return render_template('serie.html')
+    url = "https://api.betaseries.com/shows/episodes"
+    querystring = {"key": "7c2f686dfaad", "v": "3.0", "id":19339}
+    episodes = requests.request("GET", url, params=querystring).json()
+    url2 = "https://api.betaseries.com/shows/seasons"
+    saisons = requests.request("GET", url2, params=querystring).json()
+    url3 = "https://api.betaseries.com/shows/display"
+    display = requests.request("GET", url3, params=querystring).json()
+    return render_template('serie.html', episodes=episodes, saisons=saisons, display=display)
 
 @app.route('/about/')
 def about():
