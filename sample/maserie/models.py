@@ -4,7 +4,7 @@
 """
 
 from flask_sqlalchemy import SQLAlchemy
-from views import app
+from .views import app
 import datetime
 
 # Create database connection object

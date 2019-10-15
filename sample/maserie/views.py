@@ -7,7 +7,7 @@ from flask import Flask, render_template , request , session , redirect ,url_for
 import requests
 import hashlib, uuid,os
 import sqlite3
-conn = sqlite3.connect('app.db')
+conn = sqlite3.connect('app.db',check_same_thread=False)
 cursor=conn.cursor()
 # Crée l'application Flask
 app = Flask(__name__)
@@ -86,6 +86,7 @@ def register():
         mdp = request.form["psw"]
         mdp2 = request.form["psw-repeat"]
 
+
         """verifier si l'e-mail n'est pas deja utilisé par un client"""
 
         req_client_existant = "SELECT * FROM main.client WHERE adresse_mail = '%s' "
@@ -96,15 +97,20 @@ def register():
         '''Si on a déjà un e-mail avec cette adresse, on dit que le mail est déjà utilisé'''
 
         if len(resultat_req_client_existant) > 0:
-            error = 'Cette adresse courriel est deja utilisee, veuillez utiliser une autre adresse'
+            error = 'Cette adresse courriel est deja utilisée, veuillez utiliser une autre adresse'
             return render_template("register.html", error=error)
 
         # """Sinon on enregistre les informations du client dans la BD"""
 
         else:
-            cursor.execute("INSERT INTO client(id_client, adresse_mail, mdp, nom_utilisateur) VALUES(?,?,?,?);",(id_client, adresse_mail, mdp, nom_utilisateur))
-            conn.commit()
-            return redirect(url_for('home'))
+            if mdp!= mdp2:
+                error= "Vous devez utiliser le même mot de passe"
+                return render_template("register.html", error=error)
+            else:
+
+                cursor.execute("INSERT INTO client(id_client, adresse_mail, mdp, nom_utilisateur) VALUES(?,?,?,?);",(id_client, adresse_mail, mdp, nom_utilisateur))
+                conn.commit()
+                return redirect(url_for('home'))
 
 
 
