@@ -43,11 +43,20 @@ def my_list():
     return render_template('my_list.html', posts=posts)
 
 @app.route('/series_alphabet/<starting>/<int:page>/')
-def series_alphabet(starting, page):
-    url = "https://api.betaseries.com/shows/list"
-    querystring = {"key": "7c2f686dfaad", "v": "3.0", "order": "alphabetical", "limit": "9", "starting": starting, "start": (page-1)*9, "fields": "id,images.show,title"}
-    posts = requests.request("GET", url, params=querystring).json()["shows"]
-    return render_template('series_alphabet.html', posts=posts, starting=starting, page=page)
+@app.route('/series_alphabet/<starting>/<int:page>/?q=<query>')
+def series_alphabet(starting, page, query=None):
+    if not query:
+        url = "https://api.betaseries.com/shows/list"
+        querystring = {"key": "7c2f686dfaad", "v": "3.0", "order": "alphabetical", "limit": "9", "starting": starting,
+                       "start": (page-1)*9, "fields": "id,images.show,title"}
+        posts = requests.request("GET", url, params=querystring).json()["shows"]
+        return render_template('series_alphabet.html', posts=posts, starting=starting, page=page)
+
+    else:
+        url = "https://api.betaseries.com/search/all"
+        querystring = {"key": "7c2f686dfaad", "v": "3.0", "limit": "9" ,"query": query}
+        posts = requests.request("GET", url, params=querystring).json()["shows"]
+        return render_template('series_alphabet.html', posts=posts, starting=0, page=0)
 
 @app.route('/series_categories/')
 def series_categories():
