@@ -56,7 +56,7 @@ def series_categories():
 @app.route('/serie/')
 def serie():
     url = "https://api.betaseries.com/shows/episodes"
-    querystring = {"key": "7c2f686dfaad", "v": "3.0", "id":2455}
+    querystring = {"key": "7c2f686dfaad", "v": "3.0", "id":content_id}
     episodes = requests.request("GET", url, params=querystring).json()
     url2 = "https://api.betaseries.com/shows/seasons"
     saisons = requests.request("GET", url2, params=querystring).json()
