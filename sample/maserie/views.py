@@ -71,23 +71,20 @@ def about():
 
 @app.route("/register/", methods=["GET", "POST"])
 def register():
-
     error = None
 
     if "e_mail" in session:
         return redirect(url_for('se connecter'))
 
     if request.method == "GET":
-        return render_template("register.html",)
+        return render_template("register.html", )
     if request.method == "POST":
 
-        id_client= str(uuid.uuid4())
-        nom_utilisateur = request.form["Nom d'utilisateur"]
-        adresse_mail = request.form["Email"]
-        mdp = request.form["Password"]
-        mdp2= request.form["Repeat Password"]
-        mdp_hash = hashlib.sha256(str(mdp).encode("utf-8")).hexdigest()
-
+        id_client = str(uuid.uuid4())
+        nom_utilisateur = request.form["username"]
+        adresse_mail = request.form["email"]
+        mdp = request.form["psw"]
+        mdp2 = request.form["psw-repeat"]
 
         """verifier si l'e-mail n'est pas deja utilisé par un client"""
 
@@ -96,21 +93,17 @@ def register():
         resultat_req_client_existant = cursor.fetchall()
         print(resultat_req_client_existant)
 
-
         '''Si on a déjà un e-mail avec cette adresse, on dit que le mail est déjà utilisé'''
 
         if len(resultat_req_client_existant) > 0:
             error = 'Cette adresse courriel est deja utilisee, veuillez utiliser une autre adresse'
-            return render_template("enregistrer_client.html",error = error)
+            return render_template("register.html", error=error)
 
-        #"""Sinon on enregistre les informations du client dans la BD"""
+        # """Sinon on enregistre les informations du client dans la BD"""
 
         else:
-
-            req_enregister_client = "INSERT INTO main.client (id_client,adresse_mail,mdp,nom_utilisateur)VALUES(%s,%s,%s,%s,%s,%s)"
-            cursor.execute(req_enregister_client,(id_client,adresse_mail,mdp,nom_utilisateur))
+            cursor.execute("INSERT INTO client(id_client, adresse_mail, mdp, nom_utilisateur) VALUES(?,?,?,?);",(id_client, adresse_mail, mdp, nom_utilisateur))
             conn.commit()
-
             return redirect(url_for('home'))
 
 
