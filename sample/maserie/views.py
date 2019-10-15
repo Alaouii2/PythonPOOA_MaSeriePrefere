@@ -42,21 +42,21 @@ def my_list():
     posts = requests.request("GET", url, params=querystring).json()["shows"]
     return render_template('my_list.html', posts=posts)
 
-@app.route('/series_alphabet/')
-def series_alphabet():
-    url = "https://api.betaseries.com/shows/random"
-    querystring = {"key": "7c2f686dfaad", "v": "3.0", "nb": "9"}
+@app.route('/series_alphabet/<starting>/<int:page>/')
+def series_alphabet(starting, page):
+    url = "https://api.betaseries.com/shows/list"
+    querystring = {"key": "7c2f686dfaad", "v": "3.0", "order": "alphabetical", "limit": "9", "starting": starting, "start": (page-1)*9}
     posts = requests.request("GET", url, params=querystring).json()["shows"]
-    return render_template('series_alphabet.html', posts=posts)
+    return render_template('series_alphabet.html', posts=posts, starting=starting, page=page)
 
 @app.route('/series_categories/')
 def series_categories():
     return render_template('series_categories.html')
 
-@app.route('/serie/')
-def serie():
+@app.route('/serie/<int:serie_id>/')
+def serie(serie_id):
     url = "https://api.betaseries.com/shows/episodes"
-    querystring = {"key": "7c2f686dfaad", "v": "3.0", "id":1993}
+    querystring = {"key": "7c2f686dfaad", "v": "3.0", "id":serie_id}
     episodes = requests.request("GET", url, params=querystring).json()
     url2 = "https://api.betaseries.com/shows/seasons"
     saisons = requests.request("GET", url2, params=querystring).json()
@@ -120,3 +120,6 @@ def register():
 # @app.route('/contents/<int:content_id>/')
 # def content(content_id):
 #     return '%s' % content_id
+
+# api call interessants :
+# display (infos générales), season, episodes, list, random, search, genres

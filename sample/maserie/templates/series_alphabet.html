@@ -74,7 +74,7 @@
 						<!-- Menu -->
 						<ul class="main-menu primary-menu">
 							<li><a href="{{ url_for('home')}}">Accueil</a></li>
-							<li><a href="{{ url_for('series_alphabet')}}">Séries</a></li>
+							<li><a href="{{ url_for('series_alphabet', starting=' ', page=1)}}">Séries</a></li>
 							<li><a href="{{ url_for('about')}}">À Propos</a></li>
 							<li><a href="{{ url_for('my_list')}}">Ma Liste</a></li>
 						</ul>
@@ -93,33 +93,33 @@
 		</div>
 		<div class="container">
 			<ul class="game-filter">
-				<li><a href="">#</a></li>
-				<li><a href="">A</a></li>
-				<li><a href="">B</a></li>
-				<li><a href="">C</a></li>
-				<li><a href="">D</a></li>
-				<li><a href="">E</a></li>
-				<li><a href="">F</a></li>
-				<li><a href="">G</a></li>
-				<li><a href="">H</a></li>
-				<li><a href="">I</a></li>
-				<li><a href="">J</a></li>
-				<li><a href="">K</a></li>
-				<li><a href="">L</a></li>
-				<li><a href="">M</a></li>
-				<li><a href="">N</a></li>
-				<li><a href="">O</a></li>
-				<li><a href="">P</a></li>
-				<li><a href="">Q</a></li>
-				<li><a href="">R</a></li>
-				<li><a href="">S</a></li>
-				<li><a href="">T</a></li>
-				<li><a href="">U</a></li>
-				<li><a href="">V</a></li>
-				<li><a href="">W</a></li>
-				<li><a href="">X</a></li>
-				<li><a href="">Y</a></li>
-				<li><a href="">Z</a></li>
+				<li><a href="{{ url_for('series_alphabet', starting=' ', page=1)}}">#</a></li>
+				<li><a href="{{ url_for('series_alphabet', starting='A', page=1)}}">A</a></li>
+				<li><a href="{{ url_for('series_alphabet', starting='B', page=1)}}">B</a></li>
+				<li><a href="{{ url_for('series_alphabet', starting='C', page=1)}}">C</a></li>
+				<li><a href="{{ url_for('series_alphabet', starting='D', page=1)}}">D</a></li>
+				<li><a href="{{ url_for('series_alphabet', starting='E', page=1)}}">E</a></li>
+				<li><a href="{{ url_for('series_alphabet', starting='F', page=1)}}">F</a></li>
+				<li><a href="{{ url_for('series_alphabet', starting='G', page=1)}}">G</a></li>
+				<li><a href="{{ url_for('series_alphabet', starting='H', page=1)}}">H</a></li>
+				<li><a href="{{ url_for('series_alphabet', starting='I', page=1)}}">I</a></li>
+				<li><a href="{{ url_for('series_alphabet', starting='J', page=1)}}">J</a></li>
+				<li><a href="{{ url_for('series_alphabet', starting='K', page=1)}}">K</a></li>
+				<li><a href="{{ url_for('series_alphabet', starting='L', page=1)}}">L</a></li>
+				<li><a href="{{ url_for('series_alphabet', starting='M', page=1)}}">M</a></li>
+				<li><a href="{{ url_for('series_alphabet', starting='N', page=1)}}">N</a></li>
+				<li><a href="{{ url_for('series_alphabet', starting='O', page=1)}}">O</a></li>
+				<li><a href="{{ url_for('series_alphabet', starting='P', page=1)}}">P</a></li>
+				<li><a href="{{ url_for('series_alphabet', starting='Q', page=1)}}">Q</a></li>
+				<li><a href="{{ url_for('series_alphabet', starting='R', page=1)}}">R</a></li>
+				<li><a href="{{ url_for('series_alphabet', starting='S', page=1)}}">S</a></li>
+				<li><a href="{{ url_for('series_alphabet', starting='T', page=1)}}">T</a></li>
+				<li><a href="{{ url_for('series_alphabet', starting='U', page=1)}}">U</a></li>
+				<li><a href="{{ url_for('series_alphabet', starting='V', page=1)}}">V</a></li>
+				<li><a href="{{ url_for('series_alphabet', starting='W', page=1)}}">W</a></li>
+				<li><a href="{{ url_for('series_alphabet', starting='X', page=1)}}">X</a></li>
+				<li><a href="{{ url_for('series_alphabet', starting='Y', page=1)}}">Y</a></li>
+				<li><a href="{{ url_for('series_alphabet', starting='Z', page=1)}}">Z</a></li>
 			</ul>
 			<div class="row">
 				<div class="col-xl-7 col-lg-8 col-md-7">
@@ -127,11 +127,11 @@
 						{% for post in posts %}
 						<div class="col-lg-4 col-md-6">
 							<div class="game-item">
-								<a href="{{ url_for('serie')}}" class="read-more">
+								<a href="{{ url_for('serie', serie_id=post.id)}}" class="read-more">
 									<img src={{ post.images.show }} alt="#"/>
 								</a>
 								<h5>{{ post.title }}</h5>
-								<a href="{{ url_for('serie')}}" class="read-more">
+								<a href="{{ url_for('serie', serie_id=post.id)}}" class="read-more">
 									Read More
 									<img src="{{ url_for('static', filename='img/icons/double-arrow.png')}}" alt="#"/>
 								</a>
@@ -141,9 +141,9 @@
 						{% endfor %}
 					</div>
 					<div class="site-pagination">
-						<a href="#" class="active">01.</a>
-						<a href="#">02.</a>
-						<a href="#">03.</a>
+						<a href="{{ url_for('series_alphabet', starting=starting, page=1)}}">01.</a>
+						<a href="{{ url_for('series_alphabet', starting=starting, page=2)}}">02.</a>
+						<a href="{{ url_for('series_alphabet', starting=starting, page=3)}}">03.</a>
 					</div>
 				</div>
 				<div class="col-xl-3 col-lg-4 col-md-5 sidebar game-page-sideber">

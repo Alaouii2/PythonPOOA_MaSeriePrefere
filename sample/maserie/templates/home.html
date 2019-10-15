@@ -90,7 +90,7 @@
 						<!-- Menu -->
 						<ul class="main-menu primary-menu">
 							<li><a href="{{ url_for('home')}}">Accueil</a></li>
-							<li><a href="{{ url_for('series_alphabet')}}">Séries</a></li>
+							<li><a href="{{ url_for('series_alphabet', starting=' ', page=1)}}">Séries</a></li>
 							<li><a href="{{ url_for('about')}}">À Propos</a></li>
 							<li><a href="{{ url_for('my_list')}}">Ma Liste</a></li>
 						</ul>
@@ -113,8 +113,8 @@
 					<div class="intro-text-box text-box text-white">
 						<h3>{{ post.title }}</h3>
 						<p>{{ post.description }}</p>
-						<a href="{{ url_for('serie')}}" class="read-more">Read More  <img src="{{ url_for('static', filename='img/icons/double-arrow.png')}}" alt="#"/></a>
-						<a href="{{ url_for('serie')}}" class="read-more"><img src={{ post.images.show }} alt="#"/></a>
+						<a href="{{ url_for('serie', serie_id=post.id)}}" class="read-more">Read More  <img src="{{ url_for('static', filename='img/icons/double-arrow.png')}}" alt="#"/></a>
+						<a href="{{ url_for('serie', serie_id=post.id)}}" class="read-more"><img src={{ post.images.show }} alt="#"/></a>
 					</div>
 				</div>
 				{% endfor %}
