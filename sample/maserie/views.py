@@ -43,20 +43,16 @@ def my_list():
     return render_template('my_list.html', posts=posts)
 
 @app.route('/series_alphabet/<starting>/<int:page>/')
-@app.route('/series_alphabet/<starting>/<int:page>/?q=<query>')
-def series_alphabet(starting, page, query=None):
-    if not query:
-        url = "https://api.betaseries.com/shows/list"
-        querystring = {"key": "7c2f686dfaad", "v": "3.0", "order": "alphabetical", "limit": "9", "starting": starting,
-                       "start": (page-1)*9, "fields": "id,images.show,title"}
-        posts = requests.request("GET", url, params=querystring).json()["shows"]
-        return render_template('series_alphabet.html', posts=posts, starting=starting, page=page)
+def series_alphabet(starting, page):
+    url = "https://api.betaseries.com/shows/list"
+    querystring = {"key": "7c2f686dfaad", "v": "3.0", "order": "alphabetical", "limit": "9", "starting": starting,
+                   "start": (page-1)*9, "fields": "id,title,images.show"}
+    posts = requests.request("GET", url, params=querystring).json()["shows"]
+    for post in posts:
+        if len(post.keys()) == 2:
+            post['images'] = {'show': url_for('static', filename='img/logo.png')}
+    return render_template('series_alphabet.html', posts=posts, starting=starting, page=page)
 
-    else:
-        url = "https://api.betaseries.com/search/all"
-        querystring = {"key": "7c2f686dfaad", "v": "3.0", "limit": "9" ,"query": query}
-        posts = requests.request("GET", url, params=querystring).json()["shows"]
-        return render_template('series_alphabet.html', posts=posts, starting=0, page=0)
 
 @app.route('/series_categories/')
 def series_categories():
@@ -66,11 +62,11 @@ def series_categories():
 def serie(serie_id):
     url = "https://api.betaseries.com/shows/episodes"
     querystring = {"key": "7c2f686dfaad", "v": "3.0", "id":serie_id}
-    episodes = requests.request("GET", url, params=querystring).json()
+    episodes = requests.request("GET", url, params=querystring).json()["episodes"]
     url2 = "https://api.betaseries.com/shows/seasons"
-    saisons = requests.request("GET", url2, params=querystring).json()
+    saisons = requests.request("GET", url2, params=querystring).json()["seasons"]
     url3 = "https://api.betaseries.com/shows/display"
-    display = requests.request("GET", url3, params=querystring).json()
+    display = requests.request("GET", url3, params=querystring).json()["show"]
     return render_template('serie.html', episodes=episodes, saisons=saisons, display=display)
 
 @app.route('/about/')

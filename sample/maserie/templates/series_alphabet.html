@@ -90,13 +90,6 @@
 	<section class="games-section">
 		<div class="container text-white">
 			<h1>Séries</h1>
-			<form class="search-widget">
-			  <div>
-				<input type="search" id="maRecherche" name="q"
-				 placeholder="Rechercher sur le site…">
-				<button>Rechercher</button>
-			  </div>
-			</form>
 		</div>
 		<div class="container">
 			<ul class="game-filter">
@@ -135,7 +128,9 @@
 						<div class="col-lg-4 col-md-6">
 							<div class="game-item">
 								<a href="{{ url_for('serie', serie_id=post.id)}}" class="read-more">
-									<img src={{ post.images.show }} alt="#"/>
+									{% if post.images.show %}
+										<img src={{ post.images.show }} alt="#"/>
+									{% endif %}
 								</a>
 								<h5>{{ post.title }}</h5>
 								<a href="{{ url_for('serie', serie_id=post.id)}}" class="read-more">
@@ -151,23 +146,6 @@
 						<a href="{{ url_for('series_alphabet', starting=starting, page=1)}}">01.</a>
 						<a href="{{ url_for('series_alphabet', starting=starting, page=2)}}">02.</a>
 						<a href="{{ url_for('series_alphabet', starting=starting, page=3)}}">03.</a>
-					</div>
-				</div>
-				<div class="col-xl-3 col-lg-4 col-md-5 sidebar game-page-sideber">
-					<div id="stickySidebar">
-						<div class="widget-item">
-							<div class="categories-widget">
-								<h4 class="widget-title">Genre</h4>
-								<ul>
-									<li><a href="">Drame</a></li>
-									<li><a href="">Comédie</a></li>
-									<li><a href="">Mystère</a></li>
-									<li><a href="">Enfants</a></li>
-									<li><a href="">Télé-réalité</a></li>
-									<li><a href="">Mini-série</a></li>
-								</ul>
-							</div>
-						</div>
 					</div>
 				</div>
 			</div>

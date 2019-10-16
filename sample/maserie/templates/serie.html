@@ -94,54 +94,61 @@
 	<section class="games-single-page">
 		<div class="container">
 			<div class="game-single-preview">
-				<img src={{ display.show.images.show }} alt="#"/>
+				<img src={{ display.images.show }} alt="#"/>
 			</div>
 			<div class="row">
 				<button>Add</button>
 				<div class="col-xl-9 col-lg-8 col-md-7 game-single-content">
 					<div class="gs-meta">11.11.18</div>
 
-					<h2 class="gs-title">{{ display.show.title }}</h2>
-					<p>{{ display.show.description }}</p>
-					<p>Nombre de saisons : {{ display.show.seasons }}</p>
-					<p>Nombre d'épisodes : {{ display.show.episodes }}</p>
-					{% for saison in saisons.seasons %}
-						<h4>Saison {{ saison.number }}</h4>
-						<p>Contient {{ saison.episodes }} episodes</p>
-						{% for episode in episodes.episodes %}
-							<p>{{ episode.title }}</p>
+					<h2 class="gs-title">{{ display.title }}</h2>
+					<p>{{ display.description }}</p>
+					<h5 style="color: white">Nombre de saisons : {{ display.seasons }}</h5>
+					<h5 style="color: white">Nombre d'épisodes : {{ display.episodes }}</h5>
+									{% for saison in saisons %}
+				 <!-- Tab links -->
+<div class="tab">
+  <button class="tablinks" onclick="openSeason(event, 'saison {{saison.number}}')">Saison {{ saison.number }}</button>
+</div>
+
+
+<!-- Tab content -->
+
+<div id="saison {{ saison.number }}" class="tabcontent">
+<h4>Saison {{ saison.number }}</h4>
+						<h6>Contient {{ saison.episodes }} episodes</h6>
+						{% for episode in episodes %}
+							{% if episode.season == saison.number %}
+							<h5>Episode {{ episode.episode }} - {{ episode.title }}</h5>
 							<p>{{ episode.description }}</p>
+							{% endif %}
 						{% endfor %}
-					{% endfor %}
+</div>
+								{% endfor %}
 				</div>
-				<div class="col-xl-3 col-lg-4 col-md-5 sidebar game-page-sideber">
-					<div id="stickySidebar">
-						<div class="widget-item">
-							<div class="rating-widget">
-								<h4 class="widget-title">Ratings</h4>
-								<ul>
-									<li>Price<span>3.5/5</span></li>
-									<li>Graphics<span>4.5/5</span></li>
-									<li>Levels<span>3.5/5</span></li>
-									<li>Levels<span>4.5/5</span></li>
-									<li>Dificulty<span>4.5/5</span></li>
-								</ul>
-								<div class="rating">
-									<h5><i>Rating</i><span>4.5</span> / 5</h5>
-								</div>
-							</div>
-						</div>
-						<div class="widget-item">
-							<div class="testimonials-widget">
-								<h4 class="widget-title">Testimonials</h4>
-								<div class="testim-text">
-									<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolo re magna aliqua. Quis ipsum suspend isse ultrices.</p>
-									<h6><span>James Smith,</span>Gamer</h6>
-								</div>
-							</div>
-						</div>
-					</div>
-				</div>
+<script>
+function openSeason(evt, seasonNumber) {
+  // Declare all variables
+  var i, tabcontent, tablinks;
+
+  // Get all elements with class="tabcontent" and hide them
+  tabcontent = document.getElementsByClassName("tabcontent");
+  for (i = 0; i < tabcontent.length; i++) {
+    tabcontent[i].style.display = "none";
+  }
+
+  // Get all elements with class="tablinks" and remove the class "active"
+  tablinks = document.getElementsByClassName("tablinks");
+  for (i = 0; i < tablinks.length; i++) {
+    tablinks[i].className = tablinks[i].className.replace(" active", "");
+  }
+
+  // Show the current tab, and add an "active" class to the button that opened the tab
+  document.getElementById(seasonNumber).style.display = "block";
+  evt.currentTarget.className += " active";
+}
+</script>
+
 			</div>
 		</div>
 	</section>
