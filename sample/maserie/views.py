@@ -3,12 +3,15 @@
     C'est le module gérant le front de notre application
 """
 
-from flask import Flask, render_template , request , session , redirect ,url_for
+from flask import Flask, render_template, request, session, redirect, url_for
 import requests
-import hashlib, uuid,os
+import hashlib, uuid, os
 import sqlite3
-conn = sqlite3.connect('app.db',check_same_thread=False)
-cursor=conn.cursor()
+
+#Crée une connection à la base de donnée
+conn = sqlite3.connect('app.db', check_same_thread=False)
+cursor = conn.cursor()
+
 # Crée l'application Flask
 app = Flask(__name__)
 
@@ -20,8 +23,6 @@ class Requete():
     pass
 
 # Routage des pages
-
-## from .utils import find_content, OpenGraphImage
 
 # La page d'accueil. Affiche trois séries au hasard.
 @app.route('/')
@@ -35,15 +36,8 @@ def home():
             post["description"] = post["description"][:500] + "..."
     return render_template('home.html', posts=posts)
 
-@app.route('/my_list/')
-def my_list():
-    url = "https://api.betaseries.com/shows/random"
-    querystring = {"key":"7c2f686dfaad","v":"3.0","nb":"3"}
-    posts = requests.request("GET", url, params=querystring).json()["shows"]
-    return render_template('my_list.html', posts=posts)
-
-@app.route('/series_alphabet/<starting>/<int:page>/')
-def series_alphabet(starting, page):
+@app.route('/series/<starting>/<int:page>/')
+def series(starting, page):
     url = "https://api.betaseries.com/shows/list"
     querystring = {"key": "7c2f686dfaad", "v": "3.0", "order": "alphabetical", "limit": "9", "starting": starting,
                    "start": (page-1)*9, "fields": "id,title,images.show"}
@@ -51,12 +45,7 @@ def series_alphabet(starting, page):
     for post in posts:
         if len(post.keys()) == 2:
             post['images'] = {'show': url_for('static', filename='img/logo.png')}
-    return render_template('series_alphabet.html', posts=posts, starting=starting, page=page)
-
-
-@app.route('/series_categories/')
-def series_categories():
-    return render_template('series_categories.html')
+    return render_template('series.html', posts=posts, starting=starting, page=page)
 
 @app.route('/serie/<int:serie_id>/')
 def serie(serie_id):
@@ -69,10 +58,12 @@ def serie(serie_id):
     display = requests.request("GET", url3, params=querystring).json()["show"]
     return render_template('serie.html', episodes=episodes, saisons=saisons, display=display)
 
-@app.route('/about/')
-def about():
-    return render_template('about.html')
-
+@app.route('/my_list/')
+def my_list():
+    url = "https://api.betaseries.com/shows/random"
+    querystring = {"key":"7c2f686dfaad","v":"3.0","nb":"3"}
+    posts = requests.request("GET", url, params=querystring).json()["shows"]
+    return render_template('my_list.html', posts=posts)
 
 @app.route("/register/", methods=["GET", "POST"])
 def register():
@@ -91,39 +82,27 @@ def register():
         mdp = request.form["psw"]
         mdp2 = request.form["psw-repeat"]
 
+        # """verifier si l'e-mail n'est pas deja utilisé par un client"""
 
-        """verifier si l'e-mail n'est pas deja utilisé par un client"""
-
-        req_client_existant = "SELECT * FROM main.client WHERE adresse_mail = '%s' "
-        cursor.execute(req_client_existant % adresse_mail)
+        req_client_existant = "SELECT * FROM main.client WHERE adresse_mail = ?"
+        cursor.execute(req_client_existant, (adresse_mail,))
         resultat_req_client_existant = cursor.fetchall()
         print(resultat_req_client_existant)
 
-        '''Si on a déjà un e-mail avec cette adresse, on dit que le mail est déjà utilisé'''
+        # '''Si on a déjà un e-mail avec cette adresse, on dit que le mail est déjà utilisé'''
 
         if len(resultat_req_client_existant) > 0:
             error = 'Cette adresse courriel est deja utilisée, veuillez utiliser une autre adresse'
-            return render_template("register.html", error=error)
+            return (render_template("register.html", error=error))
 
         # """Sinon on enregistre les informations du client dans la BD"""
 
+        elif (mdp != mdp2):
+            error = "Vous devez utiliser le même mot de passe"
+            return (render_template("register.html", error=error))
+
         else:
-            if mdp!= mdp2:
-                error= "Vous devez utiliser le même mot de passe"
-                return render_template("register.html", error=error)
-            else:
+            cursor.execute("INSERT INTO client(id_client, adresse_mail, mdp, nom_utilisateur) VALUES(?,?,?,?);",(id_client, adresse_mail, mdp, nom_utilisateur))
+            conn.commit()
+            return (redirect(url_for('home')))
 
-                cursor.execute("INSERT INTO client(id_client, adresse_mail, mdp, nom_utilisateur) VALUES(?,?,?,?);",(id_client, adresse_mail, mdp, nom_utilisateur))
-                conn.commit()
-                return redirect(url_for('home'))
-
-
-
-
-
-# @app.route('/contents/<int:content_id>/')
-# def content(content_id):
-#     return '%s' % content_id
-
-# api call interessants :
-# display (infos générales), season, episodes, list, random, search, genres

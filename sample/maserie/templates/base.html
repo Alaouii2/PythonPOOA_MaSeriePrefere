@@ -1,8 +1,12 @@
 <!DOCTYPE html>
-<html lang="zxx">
+<html lang="fr">
 <head>
-	<title>Bienvenue sur ma série préférée</title>
+	<title>{% block titre %}Bienvenue sur ma série préférée{% endblock %}</title>
 	<meta charset="UTF-8">
+	<meta name="description" content="Serie Magazine Template">
+	<meta name="keywords" content="series, magazine, html">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
 	<!-- Favicon -->
 	<link href="{{ url_for('static', filename='img/favicon.ico')}}" rel="shortcut icon"/>
 
@@ -28,6 +32,7 @@
 	<![endif]-->
 
 </head>
+
 <body>
 
 	<!-- Page Preloder -->
@@ -74,8 +79,7 @@
 						<!-- Menu -->
 						<ul class="main-menu primary-menu">
 							<li><a href="{{ url_for('home')}}">Accueil</a></li>
-							<li><a href="{{ url_for('series_alphabet', starting=' ', page=1)}}">Séries</a></li>
-							<li><a href="{{ url_for('about')}}">À Propos</a></li>
+							<li><a href="{{ url_for('series', starting=' ', page=1)}}">Séries</a></li>
 							<li><a href="{{ url_for('my_list')}}">Ma Liste</a></li>
 						</ul>
 					</nav>
@@ -85,73 +89,9 @@
 	</section>
 	<!-- Header section end -->
 
+{% block content %}
 
-	<!-- Games section -->
-	<section class="games-section">
-		<div class="container text-white">
-			<h1>Séries</h1>
-		</div>
-		<div class="container">
-			<ul class="game-filter">
-				<li><a href="{{ url_for('series_alphabet', starting=' ', page=1)}}">#</a></li>
-				<li><a href="{{ url_for('series_alphabet', starting='A', page=1)}}">A</a></li>
-				<li><a href="{{ url_for('series_alphabet', starting='B', page=1)}}">B</a></li>
-				<li><a href="{{ url_for('series_alphabet', starting='C', page=1)}}">C</a></li>
-				<li><a href="{{ url_for('series_alphabet', starting='D', page=1)}}">D</a></li>
-				<li><a href="{{ url_for('series_alphabet', starting='E', page=1)}}">E</a></li>
-				<li><a href="{{ url_for('series_alphabet', starting='F', page=1)}}">F</a></li>
-				<li><a href="{{ url_for('series_alphabet', starting='G', page=1)}}">G</a></li>
-				<li><a href="{{ url_for('series_alphabet', starting='H', page=1)}}">H</a></li>
-				<li><a href="{{ url_for('series_alphabet', starting='I', page=1)}}">I</a></li>
-				<li><a href="{{ url_for('series_alphabet', starting='J', page=1)}}">J</a></li>
-				<li><a href="{{ url_for('series_alphabet', starting='K', page=1)}}">K</a></li>
-				<li><a href="{{ url_for('series_alphabet', starting='L', page=1)}}">L</a></li>
-				<li><a href="{{ url_for('series_alphabet', starting='M', page=1)}}">M</a></li>
-				<li><a href="{{ url_for('series_alphabet', starting='N', page=1)}}">N</a></li>
-				<li><a href="{{ url_for('series_alphabet', starting='O', page=1)}}">O</a></li>
-				<li><a href="{{ url_for('series_alphabet', starting='P', page=1)}}">P</a></li>
-				<li><a href="{{ url_for('series_alphabet', starting='Q', page=1)}}">Q</a></li>
-				<li><a href="{{ url_for('series_alphabet', starting='R', page=1)}}">R</a></li>
-				<li><a href="{{ url_for('series_alphabet', starting='S', page=1)}}">S</a></li>
-				<li><a href="{{ url_for('series_alphabet', starting='T', page=1)}}">T</a></li>
-				<li><a href="{{ url_for('series_alphabet', starting='U', page=1)}}">U</a></li>
-				<li><a href="{{ url_for('series_alphabet', starting='V', page=1)}}">V</a></li>
-				<li><a href="{{ url_for('series_alphabet', starting='W', page=1)}}">W</a></li>
-				<li><a href="{{ url_for('series_alphabet', starting='X', page=1)}}">X</a></li>
-				<li><a href="{{ url_for('series_alphabet', starting='Y', page=1)}}">Y</a></li>
-				<li><a href="{{ url_for('series_alphabet', starting='Z', page=1)}}">Z</a></li>
-			</ul>
-			<div class="row">
-				<div class="col-xl-7 col-lg-8 col-md-7">
-					<div class="row">
-						{% for post in posts %}
-						<div class="col-lg-4 col-md-6">
-							<div class="game-item">
-								<a href="{{ url_for('serie', serie_id=post.id)}}" class="read-more">
-									{% if post.images.show %}
-										<img src={{ post.images.show }} alt="#"/>
-									{% endif %}
-								</a>
-								<h5>{{ post.title }}</h5>
-								<a href="{{ url_for('serie', serie_id=post.id)}}" class="read-more">
-									Read More
-									<img src="{{ url_for('static', filename='img/icons/double-arrow.png')}}" alt="#"/>
-								</a>
-								<button type="site-btn">Add</button>
-							</div>
-						</div>
-						{% endfor %}
-					</div>
-					<div class="site-pagination">
-						<a href="{{ url_for('series_alphabet', starting=starting, page=1)}}">01.</a>
-						<a href="{{ url_for('series_alphabet', starting=starting, page=2)}}">02.</a>
-						<a href="{{ url_for('series_alphabet', starting=starting, page=3)}}">03.</a>
-					</div>
-				</div>
-			</div>
-		</div>
-	</section>
-	<!-- Games end-->
+{% endblock %}
 
 
 	<!-- Footer section -->
@@ -174,6 +114,17 @@
 	<script src="{{ url_for('static', filename='js/jquery.sticky-sidebar.min.js')}}"></script>
 	<script src="{{ url_for('static', filename='js/jquery.magnific-popup.min.js')}}"></script>
 	<script src="{{ url_for('static', filename='js/main.js')}}"></script>
+	<script>
+	// Get the modal
+	var modal = document.getElementById('id01');
+
+	// When the user clicks anywhere outside of the modal, close it
+	window.onclick = function(event) {
+		if (event.target == modal) {
+			modal.style.display = "none";
+		}
+	}
+	</script>
 
 	</body>
 </html>
