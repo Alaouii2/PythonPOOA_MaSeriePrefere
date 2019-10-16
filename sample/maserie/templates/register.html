@@ -29,10 +29,12 @@
 
 </head>
 <body>
-
-  <form action="/action_page.php">
+  <form method="post">
     <div class="container">
       <h1>Register</h1>
+        {% if error %}
+    <p class="error" style="color:red"><strong>Erreur : </strong>{{ error }}</p>
+      {% endif %}
       <p>Please fill in this form to create an account.</p>
       <hr>
       <label for="email"><b>Nom d'utilisateur</b></label>

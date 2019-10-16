@@ -13,7 +13,7 @@ db = SQLAlchemy(app)
 
 class Client(db.Model):
 
-    id_client = db.Column(db.Integer, primary_key=True)
+    id_client = db.Column(db.String(100), primary_key=True)
     adresse_mail = db.Column(db.String(100), nullable=False)
     mdp = db.Column(db.String(20), nullable=False)
     nom_utilisateur = db.Column(db.String(20), nullable=False)

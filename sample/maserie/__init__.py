@@ -19,6 +19,6 @@ class Initieur():
     def init_db():
         models.db.drop_all()
         models.db.create_all()
-        print("bonjour")
+        print("initialisation")
 
 initieur = Initieur()
