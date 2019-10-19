@@ -3,13 +3,7 @@
     Mais en vrai vous allez voir ca va etre open fun ce module, j'espère que vous allez apprécier !
 """
 
-from flask_sqlalchemy import SQLAlchemy
-from .views import app
-import datetime
-
-# Create database connection object
-db = SQLAlchemy(app)
-
+from . import db
 
 class Client(db.Model):
 

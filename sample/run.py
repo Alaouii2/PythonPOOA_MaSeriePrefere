@@ -10,7 +10,7 @@ from maserie import app
 # Le runner de notre application
 class Runner():
 
-    # Lance l'application Flask depuis le fichier views
+    # Lance l'application Flask depuis le fichier init
     def __init__(self):
         if __name__ == "__main__":
             app.run(debug=True)

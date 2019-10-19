@@ -45,16 +45,19 @@
 		<header class="header-section">
 			<div class="header-warp">
 				<div class="header-bar-warp d-flex">
+
 					<!-- site logo -->
 					<a href="{{ url_for('home') }}" class="site-logo">
 						<img src="{{ url_for('static', filename='img/logo.png')}}" alt="">
 					</a>
 					<nav class="top-nav-area w-100">
+
 						<!-- connection section -->
 						<div class="user-panel">
 							<button onclick="document.getElementById('id01').style.display='block'" style="width:auto">Login</button> /
 							<div id="id01" class="modal">
-							  	<form class="modal-content animate" action="/action_page.php" method="post" style="width:50%;height:50%;background-color:#000000;float:right">
+							  	<form class="modal-content animate" method="post"
+									  style="width:50%;height:50%;background-color:#000000;float:right">
 								<div class="container" style="background-color:#000000">
 								  	<label for="uname"><b>Username</b></label>
 								 	<input type="text" placeholder="Enter Username" name="uname" required>
@@ -69,18 +72,20 @@
 								</div>
 
 								<div class="container" style="background-color:#000000">
-								  	<button type="button" onclick="document.getElementById('id01').style.display='none'" class="cancelbtn">Cancel</button>
+								  	<button type="button" onclick="document.getElementById('id01').style.display='none'"
+											class="cancelbtn">Cancel</button>
 								 	<span class="psw">Forgot <a href="#">password?</a></span>
 								</div>
 							  	</form>
 							</div>
 							<a href="{{ url_for('register')}}">Register</a>
 						</div>
+
 						<!-- Menu -->
 						<ul class="main-menu primary-menu">
 							<li><a href="{{ url_for('home')}}">Accueil</a></li>
 							<li><a href="{{ url_for('series', starting=' ', page=1)}}">Séries</a></li>
-							<li><a href="{{ url_for('my_list')}}">Ma Liste</a></li>
+							<li><a href="{{ url_for('my_list', starting=' ', page=1)}}">Ma Liste</a></li>
 						</ul>
 					</nav>
 				</div>
