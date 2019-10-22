@@ -41,6 +41,7 @@ def serie(serie_id):
     return render_template('serie.html', episodes=episodes, saisons=saisons, display=display)
 
 @app.route('/my_list/<starting>/<int:page>/')
+@login_required
 def my_list(starting, page):
     url = "https://api.betaseries.com/shows/list"
     querystring = {"key": "7c2f686dfaad", "v": "3.0", "order": "alphabetical", "limit": "9", "starting": starting,
