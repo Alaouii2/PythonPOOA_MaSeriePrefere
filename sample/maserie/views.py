@@ -3,18 +3,19 @@
     C'est le module gérant le front de notre application
 """
 
+from . import app
 from flask import Flask, render_template, request, session, redirect, url_for
 import requests
 import hashlib, uuid, os
 import sqlite3
+from flask_login import current_user, login_user
+from .models import User
 
-from flask_login import current_user, login_required
+from threading import Thread
 
-# Crée l'application Flask
-app = Flask(__name__)
-#Crée une connection à la base de donnée
-conn = sqlite3.connect('app.db', check_same_thread=False)
-cursor = conn.cursor()
+# #Crée une connection à la base de donnée
+# conn = sqlite3.connect('app.db', check_same_thread=False)
+# cursor = conn.cursor()
 
 #Classe de requete
 class Requete():
@@ -110,57 +111,38 @@ def register():
             return (redirect(url_for('home')))
 
 
-@app.route("/", methods=["POST"])
-def se_connecter():
-    error = None
+# @app.route("/", methods=["POST"])
+# def se_connecter():
+#     error = None
+#
+#     if request.method == "POST":
+#         uname = request.form["uname"]
+#
+#         psw = request.form["psw"]
+#
+#         req_connection_client = "SELECT * FROM Client where nom_utilisateur = '%s' AND mdp = '%s' "
+#         cursor.execute(req_connection_client % (uname, psw))
+#         resultat_connection_client = cursor.fetchall()
+#
+#         if len(resultat_connection_client) == 0:
+#             session['uname'] = None
+#             error = "Cette adresse courriel ou ce mot de passe ne sont pas valides, veuillez reessayer"
+#             return render_template("home", error=error)
+#
+#         else:
+#             session["uname"] = request.form["uname"]
+#             return redirect(url_for('home'))
 
-    if request.method == "POST":
-        uname = request.form["uname"]
-
-        psw = request.form["psw"]
-
-        req_connection_client = "SELECT * FROM Client where nom_utilisateur = '%s' AND mdp = '%s' "
-        cursor.execute(req_connection_client % (uname, psw))
-        resultat_connection_client = cursor.fetchall()
-
-        if len(resultat_connection_client) == 0:
-            session['uname'] = None
-            error = "Cette adresse courriel ou ce mot de passe ne sont pas valides, veuillez reessayer"
-            return render_template("home", error=error)
-
-        else:
-            session["uname"] = request.form["uname"]
-            return redirect(url_for('home'))
-
-@app.route('/session', methods=['GET'])
-@login_required
-def dashboard():
-    """Serve logged in Dashboard."""
-    session['redis_test'] = 'This is a session variable.'
-    return render_template('dashboard.html',
-                           title='Flask-Session Tutorial.',
-                           template='dashboard-template',
-                           current_user=current_user,
-                           body="You are now logged in!")
-
-@app.route('/login', methods=['POST'])
-def login_page():
-    """User login page."""
-    # Bypass Login screen if user is logged in
+@app.route('/login', methods=['GET', 'POST'])
+def login():
     if current_user.is_authenticated:
-        return redirect(url_for('main_bp.dashboard'))
-    login_form = LoginForm(request.form)
-    # POST: Create user and redirect them to the app
-    if request.method == 'POST':
-        if login_form.validate():
-            # Get Form Fields
-            email = request.form.get('email')
-            password = request.form.get('password')
-            # Validate Login Attempt
-            user = User.query.filter_by(email=email).first()
-            if user:
-                if user.check_password(password=password):
-                    login_user(user)
-                    return render_template('home', bonjour="bonjour")
-        flash('Invalid username/password combination')
-        return redirect(url_for('home'))
+        return redirect(url_for('index'))
+    form = LoginForm()
+    if form.validate_on_submit():
+        user = User.query.filter_by(username=form.username.data).first()
+        if user is None or not user.check_password(form.password.data):
+            flash('Invalid username or password')
+            return redirect(url_for('login'))
+        login_user(user, remember=form.remember_me.data)
+        return redirect(url_for('index'))
+    return render_template('login.html', title='Sign In', form=form)
