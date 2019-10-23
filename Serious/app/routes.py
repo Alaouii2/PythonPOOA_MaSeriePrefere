@@ -18,27 +18,37 @@ def home():
             post["description"] = post["description"][:500] + "..."
     return render_template('home.html', posts=posts, bonjour="eh non")
 
-@app.route('/series/<starting>/<int:page>/')
-def series(starting, page):
-    url = "https://api.betaseries.com/shows/list"
-    querystring = {"key": "7c2f686dfaad", "v": "3.0", "order": "alphabetical", "limit": "9", "starting": starting,
-                   "start": (page-1)*9, "fields": "id,title,images.show"}
-    posts = requests.request("GET", url, params=querystring).json()["shows"]
-    for post in posts:
-        if len(post.keys()) == 2:
+@app.route('/series/', methods=['GET', 'POST'])
+def series():
+    if request.method == 'GET':
+        url = "https://api.betaseries.com/shows/list"
+        starting = request.args.get('starting', default=' ', type=str)
+        page = request.args.get('page', default=1, type=int)
+        querystring = {"key": "7c2f686dfaad", "v": "3.0", "order": "alphabetical", "limit": "9", "starting": starting,
+                       "start": (page-1)*9, "fields": "id,title,images.show"}
+        posts = requests.request("GET", url, params=querystring).json()["shows"]
+        for post in posts:
+            if len(post.keys()) == 2:
+                post['images'] = {'show': url_for('static', filename='img/logo.png')}
+        return render_template('series.html', posts=posts, starting=starting, page=page)
+
+    elif request.method == 'POST':
+        url = "https://api.betaseries.com/search/all"
+        search = request.form['search']
+        querystring = {"key": "7c2f686dfaad", "v": "3.0", "query": search}
+        posts = requests.request("GET", url, params=querystring).json()["shows"]
+        for post in posts:
             post['images'] = {'show': url_for('static', filename='img/logo.png')}
-    return render_template('series.html', posts=posts, starting=starting, page=page)
+        return render_template('series.html', posts=posts, starting=None, page=None)
+
 
 @app.route('/serie/<int:serie_id>/')
 def serie(serie_id):
-    url = "https://api.betaseries.com/shows/episodes"
-    querystring = {"key": "7c2f686dfaad", "v": "3.0", "id":serie_id}
-    episodes = requests.request("GET", url, params=querystring).json()["episodes"]
-    url2 = "https://api.betaseries.com/shows/seasons"
-    saisons = requests.request("GET", url2, params=querystring).json()["seasons"]
-    url3 = "https://api.betaseries.com/shows/display"
-    display = requests.request("GET", url3, params=querystring).json()["show"]
-    return render_template('serie.html', episodes=episodes, saisons=saisons, display=display)
+    urls = ["https://api.betaseries.com/shows/episodes", "https://api.betaseries.com/shows/seasons", "https://api.betaseries.com/shows/display"]
+    items = ["episodes", "seasons", "show"]
+    requete_serie = Requete(serie_id, items, urls)
+    response = requete_serie.run()
+    return render_template('serie.html', episodes=response["episodes"], saisons=response["seasons"], display=response["show"])
 
 @app.route('/my_list/<starting>/<int:page>/')
 @login_required
@@ -52,6 +62,38 @@ def my_list(starting, page):
             post['images'] = {'show': url_for('static', filename='img/logo.png')}
     return render_template('series.html', posts=posts, starting=starting, page=page)
 
+from threading import Thread, RLock
+from queue import Queue
+
+
+class Requete():
+
+    def __init__(self, serie_id, items, urls):
+        self.querystring = {"key": "7c2f686dfaad", "v": "3.0", "id": serie_id}
+        self.urls = urls
+        self.items = items
+        self.response = {}
+        self.queue = Queue()
+        self.verrou = RLock()
+        for item in items:
+            self.response[item] = ""
+
+    def run(self):
+        self.queue.put(self.response)
+        threads = [Thread(target=self.requete, args=(self.querystring, item, self.verrou, self.queue, url)) for (item, url) in zip(self.items, self.urls)]
+        for thread in threads:
+            thread.start()
+        for thread in threads:
+            thread.join()
+        return self.queue.get()
+
+    @staticmethod
+    def requete(querystring, item, verrou, queue, url):
+        display = requests.request("GET", url, params=querystring).json()[item]
+        with verrou:
+            a = queue.get()
+            a[item] = display
+            queue.put(a)
 
 
 @app.route('/login', methods=['GET', 'POST'])

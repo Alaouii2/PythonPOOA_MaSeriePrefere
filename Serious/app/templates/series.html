@@ -9,7 +9,7 @@
 		</div>
 
 		<div class="container">
-			<form  method="POST" action="bonjour" class="coord_gps"  name="coord" >
+			<form  method="POST" action="" class="coord_gps"  name="coord" >
             	<label>Recherche: <input id = "search" type="text" name="search" value = ""></label>
         	</form>
 
@@ -45,6 +45,7 @@
 					</div>
 
 					<div class="site-pagination">
+						{% if starting %}
 						<a href="{{ url_for('series', starting=starting, page=1)}}">1.</a>
 						{% if page > 2 %}
 							<a style="color: white">...</a>
@@ -55,6 +56,7 @@
 						{% else %}
 							<a href="{{ url_for('series', starting=starting, page=2)}}">2.</a>
 							<a href="{{ url_for('series', starting=starting, page=3)}}">3.</a>
+						{% endif %}
 						{% endif %}
 					</div>
 				</div>
