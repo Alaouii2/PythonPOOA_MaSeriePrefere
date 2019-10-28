@@ -3,11 +3,16 @@
 {% block content %}
 	<!-- Games section -->
 	<section class="games-section">
+
 		<div class="container text-white">
 			<h1>Séries</h1>
 		</div>
 
 		<div class="container">
+			<form  method="POST" action="" class="coord_gps"  name="coord" >
+            	<label>Recherche: <input id = "search" type="text" name="search" value = ""></label>
+        	</form>
+
 			<ul class="game-filter">
 				<li><a href="{{ url_for('series', starting=' ', page=1)}}">#</a></li>
 				{% for lettre in ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P',
@@ -40,6 +45,7 @@
 					</div>
 
 					<div class="site-pagination">
+						{% if starting %}
 						<a href="{{ url_for('series', starting=starting, page=1)}}">1.</a>
 						{% if page > 2 %}
 							<a style="color: white">...</a>
@@ -50,6 +56,7 @@
 						{% else %}
 							<a href="{{ url_for('series', starting=starting, page=2)}}">2.</a>
 							<a href="{{ url_for('series', starting=starting, page=3)}}">3.</a>
+						{% endif %}
 						{% endif %}
 					</div>
 				</div>

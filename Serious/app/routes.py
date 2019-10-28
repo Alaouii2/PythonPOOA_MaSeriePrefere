@@ -2,7 +2,7 @@ from flask import render_template, flash, redirect, url_for, request
 import requests
 from app import app, db
 from app.forms import LoginForm, RegistrationForm
-from app.models import User
+from app.models import User, Liste_series
 from flask_login import current_user, login_user, logout_user, login_required
 from werkzeug.urls import url_parse
 
@@ -35,7 +35,7 @@ def series():
     elif request.method == 'POST':
         url = "https://api.betaseries.com/search/all"
         search = request.form['search']
-        querystring = {"key": "7c2f686dfaad", "v": "3.0", "query": search}
+        querystring = {"key": "7c2f686dfaad", "v": "3.0", "query": search, "limit": 100}
         posts = requests.request("GET", url, params=querystring).json()["shows"]
         for post in posts:
             post['images'] = {'show': url_for('static', filename='img/logo.png')}
@@ -48,19 +48,32 @@ def serie(serie_id):
     items = ["episodes", "seasons", "show"]
     requete_serie = Requete(serie_id, items, urls)
     response = requete_serie.run()
-    return render_template('serie.html', episodes=response["episodes"], saisons=response["seasons"], display=response["show"])
+    return render_template('serie.html', serie_id=serie_id, episodes=response["episodes"], saisons=response["seasons"], display=response["show"])
 
-@app.route('/my_list/<starting>/<int:page>/')
+
+@app.route('/my_list/', methods=['GET', 'POST'])
 @login_required
-def my_list(starting, page):
-    url = "https://api.betaseries.com/shows/list"
-    querystring = {"key": "7c2f686dfaad", "v": "3.0", "order": "alphabetical", "limit": "9", "starting": starting,
-                   "start": (page-1)*9, "fields": "id,title,images.show"}
-    posts = requests.request("GET", url, params=querystring).json()["shows"]
-    for post in posts:
-        if len(post.keys()) == 2:
+def my_list():
+    if request.method == 'GET':
+        url = "https://api.betaseries.com/shows/list"
+        starting = request.args.get('starting', default=' ', type=str)
+        page = request.args.get('page', default=1, type=int)
+        querystring = {"key": "7c2f686dfaad", "v": "3.0", "order": "alphabetical", "limit": "9", "starting": starting,
+                       "start": (page - 1) * 9, "fields": "id,title,images.show"}
+        posts = requests.request("GET", url, params=querystring).json()["shows"]
+        for post in posts:
+            if len(post.keys()) == 2:
+                post['images'] = {'show': url_for('static', filename='img/logo.png')}
+        return render_template('my_list.html', posts=posts, starting=starting, page=page)
+
+    elif request.method == 'POST':
+        url = "https://api.betaseries.com/search/all"
+        search = request.form['search']
+        querystring = {"key": "7c2f686dfaad", "v": "3.0", "query": search}
+        posts = requests.request("GET", url, params=querystring).json()["shows"]
+        for post in posts:
             post['images'] = {'show': url_for('static', filename='img/logo.png')}
-    return render_template('series.html', posts=posts, starting=starting, page=page)
+        return render_template('my_list.html', posts=posts, starting=None, page=None)
 
 from threading import Thread, RLock
 from queue import Queue
@@ -144,3 +157,12 @@ def user(username):
         {'author': user, 'body': 'Test post #2'}
     ]
     return render_template('user.html', user=user, posts=posts)
+
+@app.route('/serie/<int:serie_id>/button')
+@login_required
+def button(serie_id):
+    serie = Liste_series(person_id=current_user.get_id(), name=serie_id)
+    db.session.add(serie)
+    db.session.commit()
+    print('Ajouté ! Quel bonheur !')
+    return (""), 204
