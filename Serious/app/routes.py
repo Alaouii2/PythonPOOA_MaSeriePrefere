@@ -180,15 +180,3 @@ def my_list():
     starting = request.args.get('starting', default=' ', type=str)
     page = request.args.get('page', default=1, type=int)
     return render_template('my_list.html', posts=liste, starting=starting, page=page)
-
-    elif request.method == 'POST':
-        url = "https://api.betaseries.com/search/all"
-        search = request.form['search']
-        querystring = {"key": "7c2f686dfaad", "v": "3.0", "query": search}
-        posts = requests.request("GET", url, params=querystring).json()["shows"]
-        for post in posts:
-            images_url = "https://api.betaseries.com/shows/pictures"
-            images = {"key": "7c2f686dfaad", "v": "3.0", "id": post["id"]}
-            picture_url = requests.request("GET", images_url, params=images).json()["pictures"]
-            post['images'] = {'show': (picture_url[0]["url"] if picture_url else url_for('static', filename='img/logo.png'))}
-        return render_template('my_list.html', posts=posts, starting=None, page=None)
