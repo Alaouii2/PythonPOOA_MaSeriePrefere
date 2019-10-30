@@ -52,7 +52,7 @@
 							<a style="color: white">...</a>
 							<a href="{{ url_for('series', starting=starting, page=page-1)}}">{{page-1}}.</a>
 							<a href="{{ url_for('series', starting=starting, page=page)}}">{{page}}.</a>
-							<a href="{{ url_for('series', starting=starting, page=page+1)}}">{{page+1}}.</a>
+							<a href="{{ url_for('series', starting=starting, page=page + 1)}}">{{page + 1}}.</a>
 							<a style="color: white">...</a>
 						{% else %}
 							<a href="{{ url_for('series', starting=starting, page=2)}}">2.</a>
