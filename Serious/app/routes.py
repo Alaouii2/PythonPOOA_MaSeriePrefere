@@ -160,27 +160,19 @@ def user(username):
     ]
     return render_template('user.html', user=user, posts=posts)
 
+import sqlite3
 
-@app.route('/my_list/', methods=['GET', 'POST'])
+def query_db(query, args=(), one=False):
+    dbase = sqlite3.connect('app.db')
+    cur = dbase.execute(query, args)
+    rv = cur.fetchall()
+    cur.close()
+    return (rv[0] if rv else None) if one else rv
+
+@app.route('/my_list/')
 @login_required
 def my_list():
-    if request.method == 'GET':
-        url = "https://api.betaseries.com/shows/list"
-        starting = request.args.get('starting', default=' ', type=str)
-        page = request.args.get('page', default=1, type=int)
-        querystring = {"key": "7c2f686dfaad", "v": "3.0", "order": "alphabetical", "limit": "9", "starting": starting,
-                       "start": (page - 1) * 9, "fields": "id,title,images.show"}
-        posts = requests.request("GET", url, params=querystring).json()["shows"]
-        for post in posts:
-            if len(post.keys()) == 2:
-                post['images'] = {'show': url_for('static', filename='img/logo.png')}
-        return render_template('my_list.html', posts=posts, starting=starting, page=page)
-
-    elif request.method == 'POST':
-        url = "https://api.betaseries.com/search/all"
-        search = request.form['search']
-        querystring = {"key": "7c2f686dfaad", "v": "3.0", "query": search}
-        posts = requests.request("GET", url, params=querystring).json()["shows"]
-        for post in posts:
-            post['images'] = {'show': url_for('static', filename='img/logo.png')}
-        return render_template('my_list.html', posts=posts, starting=None, page=None)
+    liste = query_db('select * from liste_series where person_id = ? order by name asc', args=(current_user.get_id()))
+    starting = request.args.get('starting', default=' ', type=str)
+    page = request.args.get('page', default=1, type=int)
+    return render_template('my_list.html', posts=liste, starting=starting, page=page)

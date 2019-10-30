@@ -9,17 +9,6 @@
 		</div>
 
 		<div class="container">
-			<form  method="POST" action="" class="coord_gps"  name="coord" >
-            	<label>Recherche: <input id = "search" type="text" name="search" value = ""></label>
-        	</form>
-
-			<ul class="game-filter">
-				<li><a href="{{ url_for('series', starting=' ', page=1)}}">#</a></li>
-				{% for lettre in ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P',
-				'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z'] %}
-					<li><a href="{{ url_for('series', starting=lettre, page=1)}}">{{lettre}}</a></li>
-				{% endfor %}
-			</ul>
 
 			<div class="row">
 				<div class="col-xl-7 col-lg-8 col-md-7">
@@ -27,37 +16,19 @@
 						{% for post in posts %}
 							<div class="col-lg-4 col-md-6">
 								<div class="game-item">
-									<a href="{{ url_for('serie', serie_id=post.id)}}" class="read-more">
-										{% if post.images.show %}
-											<img src={{ post.images.show }} alt="#"/>
-										{% endif %}
+									<a href="{{ url_for('serie', serie_id=post[2])}}" class="read-more">
+
 									</a>
 
-									<h5>{{ post.title }}</h5>
-									<a href="{{ url_for('serie', serie_id=post.id)}}" class="read-more">Read More
+									<h5>{{ post[2] }}</h5>
+									<a href="{{ url_for('serie', serie_id=post[2])}}" class="read-more">Read More
 										<img src="{{ url_for('static', filename='img/icons/double-arrow.png')}}" alt="#"/>
 									</a>
 
-									<button type="site-btn">Add</button>
+									<button type="site-btn">Enlever</button>
 								</div>
 							</div>
 						{% endfor %}
-					</div>
-
-					<div class="site-pagination">
-						{% if starting %}
-						<a href="{{ url_for('series', starting=starting, page=1)}}">1.</a>
-						{% if page > 2 %}
-							<a style="color: white">...</a>
-							<a href="{{ url_for('series', starting=starting, page=page-1)}}">{{page-1}}.</a>
-							<a href="{{ url_for('series', starting=starting, page=page)}}">{{page}}.</a>
-							<a href="{{ url_for('series', starting=starting, page=page+1)}}">{{page+1}}.</a>
-							<a style="color: white">...</a>
-						{% else %}
-							<a href="{{ url_for('series', starting=starting, page=2)}}">2.</a>
-							<a href="{{ url_for('series', starting=starting, page=3)}}">3.</a>
-						{% endif %}
-						{% endif %}
 					</div>
 				</div>
 			</div>
