@@ -47,7 +47,11 @@ def series():
             querystring = {"key": "7c2f686dfaad", "v": "3.0", "query": search, "limit": 100}
             posts = requests.request("GET", url, params=querystring).json()["shows"]
             for post in posts:
-                post['images'] = {'show': url_for('static', filename='img/logo.png')}
+                images_url = "https://api.betaseries.com/shows/pictures"
+                images = {"key": "7c2f686dfaad", "v": "3.0", "id": post["id"]}
+                picture_url = requests.request("GET", images_url, params=images).json()["pictures"]
+                post['images'] = {
+                    'show': (picture_url[0]["url"] if picture_url else url_for('static', filename='img/logo.png'))}
             return render_template('series.html', posts=posts, starting=None, page=None)
 
         elif "button" in request.form:
@@ -182,5 +186,8 @@ def my_list():
         querystring = {"key": "7c2f686dfaad", "v": "3.0", "query": search}
         posts = requests.request("GET", url, params=querystring).json()["shows"]
         for post in posts:
-            post['images'] = {'show': url_for('static', filename='img/logo.png')}
+            images_url = "https://api.betaseries.com/shows/pictures"
+            images = {"key": "7c2f686dfaad", "v": "3.0", "id": post["id"]}
+            picture_url = requests.request("GET", images_url, params=images).json()["pictures"]
+            post['images'] = {'show': (picture_url[0]["url"] if picture_url else url_for('static', filename='img/logo.png'))}
         return render_template('my_list.html', posts=posts, starting=None, page=None)
