@@ -32,6 +32,10 @@
 							<img src="{{ url_for('static', filename='img/icons/double-arrow.png')}}" alt="#"/></a>
 						<a href="{{ url_for('serie', serie_id=post.id)}}" class="read-more">
 							<img src={{ post.images.show }} alt="#"/></a>
+
+						<form action="" method="POST">
+    						<button name="button" value="{{serie_id}}">Klik</button>
+						</form>
 					</div>
 				</div>
 				{% endfor %}

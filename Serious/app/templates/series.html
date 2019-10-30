@@ -38,7 +38,9 @@
 										<img src="{{ url_for('static', filename='img/icons/double-arrow.png')}}" alt="#"/>
 									</a>
 
-									<button type="site-btn">Add</button>
+									<form action="" method="post">
+    									<button name="button" value="{{post.id}}">Klik</button>
+									</form>
 								</div>
 							</div>
 						{% endfor %}
