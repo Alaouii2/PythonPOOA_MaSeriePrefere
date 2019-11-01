@@ -4,4 +4,4 @@ from app.models import User, Post, Liste_series
 
 @app.shell_context_processor
 def make_shell_context():
-    return {'db': db, 'User': User, 'Post': Post, 'Liste_series': Liste_series}
+    return {'db': db, 'User': User, 'Post': Post, 'Liste_series': Liste_series, 'Notifications': Notifications}

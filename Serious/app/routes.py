@@ -6,7 +6,6 @@ from app.models import User, Liste_series
 from flask_login import current_user, login_user, logout_user, login_required
 from werkzeug.urls import url_parse
 
-
 @app.route('/', methods=['GET', 'POST'])
 @app.route('/home/', methods=['GET', 'POST'])
 def home():
@@ -180,3 +179,32 @@ def my_list():
     starting = request.args.get('starting', default=' ', type=str)
     page = request.args.get('page', default=1, type=int)
     return render_template('my_list.html', posts=liste, starting=starting, page=page)
+
+
+from app.models import Notification
+@app.route('/notifications')
+@login_required
+def notifications():
+    since = request.args.get('since', 0.0, type=float)
+    notifications = current_user.notifications.filter(
+        Notification.timestamp > since).order_by(Notification.timestamp.asc())
+    return jsonify([{
+        'name': n.name,
+        'data': n.get_data(),
+        'timestamp': n.timestamp
+    } for n in notifications])
+
+from datetime import datetime
+@app.route('/messages')
+@login_required
+def messages():
+    current_user.last_message_read_time = datetime.utcnow()
+    db.session.commit()
+    page = request.args.get('page', 1, type=int)
+    messages = {'next_num': 1, 'has_next': True, 'has_prev': False, 'items': ["Bonjour"]}
+    next_url = url_for('messages', page=messages['next_num']) \
+        if messages['has_next'] else None
+    prev_url = url_for('messages', page=messages['prev_num']) \
+        if messages['has_prev'] else None
+    return render_template('messages.html', messages=messages['items'],
+                           next_url=next_url, prev_url=prev_url)
