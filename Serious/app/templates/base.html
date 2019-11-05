@@ -57,17 +57,6 @@
                         {% else %}
                          <a href="{{ url_for('logout')}}">Logout</a>
                         {% endif %}
-						<li>
-                        <a href="{{ url_for('messages') }}">
-
-                            {% set new_messages = current_user.new_messages() %}
-                            <span id="message_count" class="badge"
-                                  style="visibility: {% if new_messages %}visible
-                                                     {% else %}hidden {% endif %};">
-                                {{ new_messages }}
-                            </span>
-                        </a>
-						</li>
 					</div>
 
 
@@ -77,6 +66,14 @@
 							<li><a href="{{ url_for('series', starting=' ', page=1)}}">Séries</a></li>
                             {% if not current_user.is_anonymous %}
 							<li><a href="{{ url_for('my_list', starting=' ', page=1)}}">Ma Liste</a></li>
+							<li><a href="{{ url_for('messages') }}">Notifications
+								{% set new_messages = current_user.new_messages() %}
+                            	<span id="message_count" class="badge"
+                                  style="visibility: {% if new_messages %}visible
+                                                     {% else %}hidden {% endif %};">
+                                {{ new_messages }}
+                            	</span>
+							</a></li>
                             {% endif %}
 						</ul>
 					</nav>
