@@ -7,7 +7,8 @@ from flask_login import current_user, login_user, logout_user, login_required
 from werkzeug.urls import url_parse
 
 #Enlever le bouton Add et Supp quand l'utilisateur n'est pas identifié, systematiser le bouton add, objectifier, documenter
-#Empecher l'ajout de série plusieurs fois et indiquer quand fait une fois
+#Empecher l'ajout de série plusieurs fois et indiquer quand fait une fois (Add devient Supp)
+#Implémenter plus de colonnes dans l'objet my list (image etc)
 
 @app.route('/', methods=['GET', 'POST'])
 @app.route('/home/', methods=['GET', 'POST'])
