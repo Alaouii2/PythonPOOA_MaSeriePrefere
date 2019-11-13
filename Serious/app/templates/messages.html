@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+    <section class="games-section">
+
+		<div class="container text-white">
+			<h1>Vos prochains episodes</h1>
+		</div>
+
+        <div class="container game-single-content">
+        {% for post in messages %}
+            <h2 class="text-white">Titre série - N°série N°épisode</h2>
+            <p>Date diffusion</p>
+        {% endfor %}
+        </div>
+    </section>
+{% endblock %}
