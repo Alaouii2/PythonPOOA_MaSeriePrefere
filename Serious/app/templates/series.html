@@ -22,6 +22,7 @@
 			</ul>
 
 			<div class="row">
+				<div class="col-xl-7 col-lg-8 col-md-7">
 					<div class="row">
 						{% for post in posts %}
 							<div class="col-lg-4 col-md-6">
@@ -36,10 +37,13 @@
 									<a href="{{ url_for('serie', serie_id=post.id)}}" class="read-more">Read More
 										<img src="{{ url_for('static', filename='img/icons/double-arrow.png')}}" alt="#"/>
 									</a>
-
+                                    {% if current_user.is_anonymous %}
+                                    <a href="{{ url_for('login') }}"><button name="button">Ajouter</button></a>
+                                    {% else %}
 									<form action="" method="post">
     									<button name="button" value="{{post.id}}">Ajouter</button>
 									</form>
+                                    {% endif %}
 								</div>
 							</div>
 						{% endfor %}
@@ -52,7 +56,7 @@
 							<a style="color: white">...</a>
 							<a href="{{ url_for('series', starting=starting, page=page-1)}}">{{page-1}}.</a>
 							<a href="{{ url_for('series', starting=starting, page=page)}}">{{page}}.</a>
-							<a href="{{ url_for('series', starting=starting, page=page + 1)}}">{{page + 1}}.</a>
+							<a href="{{ url_for('series', starting=starting, page=page+1)}}">{{page+1}}.</a>
 							<a style="color: white">...</a>
 						{% else %}
 							<a href="{{ url_for('series', starting=starting, page=2)}}">2.</a>
@@ -60,6 +64,7 @@
 						{% endif %}
 						{% endif %}
 					</div>
+				</div>
 			</div>
 		</div>
 	</section>
