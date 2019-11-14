@@ -5,9 +5,11 @@ from app.forms import LoginForm, RegistrationForm
 from app.models import User, Liste_series
 from flask_login import current_user, login_user, logout_user, login_required
 from werkzeug.urls import url_parse
+import sqlite3
 from ast import literal_eval
 
-#Empecher l'ajout de série plusieurs fois et indiquer quand fait une fois (Add devient Supp)
+
+# Empecher l'ajout de série plusieurs fois et indiquer quand fait une fois (Add devient Supp)
 
 @app.route('/', methods=['GET', 'POST'])
 @app.route('/home/', methods=['GET', 'POST'])
@@ -15,45 +17,38 @@ def home():
     """
     Route menant au menu d'accueil
     """
-    #L'utilisateur identifié peut ajouter une nouvelle série à sa liste
+    # L'utilisateur identifié peut ajouter une nouvelle série à sa liste
     if request.method == 'POST':
         l = literal_eval(request.form.get('button'))
-        print(l)
-        serie_id = int(l[0])
-        serie_name = l[1]
-        serie_pictureurl = l[2]
-        serie = Liste_series(person_id=current_user.get_id(), serie_id=serie_id, serie_name=serie_name,
-                             serie_pictureurl=serie_pictureurl)
-        db.session.add(serie)
-        db.session.commit()
+        ajout(l)
         return (""), 204
-
-    #Page d'accueil, affiche 3 séries au hasard
+    # Page d'accueil, affiche 3 séries au hasard
     url = "https://api.betaseries.com/shows/random"
-    querystring = {"key":"7c2f686dfaad","v":"3.0","nb":"3"}
+    querystring = {"key": "7c2f686dfaad", "v": "3.0", "nb": "3"}
     posts = requests.request("GET", url, params=querystring).json()["shows"]
     for post in posts:
         if len(post["description"]) > 500:
             post["description"] = post["description"][:500] + "..."
     bonjour = ""
 
-    #Si l'utilisateur est authentifié, affiche son nom dans le message de bienvenue
+    # Si l'utilisateur est authentifié, affiche son nom dans le message de bienvenue
     if current_user.is_authenticated:
         bonjour = current_user.username
     return render_template('home.html', posts=posts, bonjour=bonjour)
+
 
 @app.route('/series/', methods=['GET', 'POST'])
 def series():
     """
     Route menant à la liste de séries disponibles
     """
-    #Affiche la liste des séries suivant la lettre et l'index choisits
+    # Affiche la liste des séries suivant la lettre et l'index choisits
     if request.method == 'GET':
         url = "https://api.betaseries.com/shows/list"
         starting = request.args.get('starting', default=' ', type=str)
         page = request.args.get('page', default=1, type=int)
         querystring = {"key": "7c2f686dfaad", "v": "3.0", "order": "alphabetical", "limit": "9", "starting": starting,
-                       "start": (page-1)*9, "fields": "id,title,images.show"}
+                       "start": (page - 1) * 9, "fields": "id,title,images.show"}
         posts = requests.request("GET", url, params=querystring).json()["shows"]
         for post in posts:
             if len(post.keys()) == 2:
@@ -61,7 +56,7 @@ def series():
         return render_template('series.html', posts=posts, starting=starting, page=page)
 
     elif request.method == 'POST':
-        #Affiche les résultat de recherche par nom, par appel à l'api
+        # Affiche les résultat de recherche par nom, par appel à l'api
         if "search" in request.form:
             url = "https://api.betaseries.com/search/all"
             search = request.form['search']
@@ -75,33 +70,24 @@ def series():
                     'show': (picture_url[0]["url"] if picture_url else url_for('static', filename='img/logo.png'))}
             return render_template('series.html', posts=posts, starting=None, page=None)
 
-        #L'utilisateur identifié peut ajouter une nouvelle série à sa liste
+        # L'utilisateur identifié peut ajouter une nouvelle série à sa liste
         elif "button" in request.form:
             l = literal_eval(request.form.get('button'))
-            print(l)
-            serie_id = int(l[0])
-            serie_name = l[1]
-            serie_pictureurl = l[2]
-            serie = Liste_series(person_id=current_user.get_id(), serie_id=serie_id, serie_name=serie_name, serie_pictureurl=serie_pictureurl)
-            db.session.add(serie)
-            db.session.commit()
+            ajout(l)
             return (""), 204
-
 
 @app.route('/serie/', methods=["GET", "POST"])
 def serie():
     """
     Route menant au descriptif d'une série
     """
-    #L'utilisateur identifié peut ajouter une nouvelle série à sa liste
+    # L'utilisateur identifié peut ajouter une nouvelle série à sa liste
     if request.method == 'POST':
-        serie_id = request.form.get('button')
-        serie = Liste_series(person_id=current_user.get_id(), name=serie_id)
-        db.session.add(serie)
-        db.session.commit()
+        l = literal_eval(request.form.get('button'))
+        ajout(l)
         return (""), 204
 
-    #Appelle l'api pour récupérer les informations pertinentes
+    # Appelle l'api pour récupérer les informations pertinentes
     serie_id = request.args.get('serie_id', type=int)
     urls = ["https://api.betaseries.com/shows/episodes", "https://api.betaseries.com/shows/seasons",
             "https://api.betaseries.com/shows/display"]
@@ -112,7 +98,6 @@ def serie():
                            display=response["show"])
 
 
-
 from threading import Thread, RLock
 from queue import Queue
 
@@ -121,6 +106,7 @@ class Requete():
     """
     Cette classe permet d'effectuer des api call en parallèle
     """
+
     def __init__(self, serie_id, items, urls):
         self.querystring = {"key": "7c2f686dfaad", "v": "3.0", "id": serie_id}
         self.urls = urls
@@ -131,7 +117,7 @@ class Requete():
         for item in items:
             self.response[item] = ""
 
-    #Crée et lance des thread en parallèle
+    # Crée et lance des thread en parallèle
     def run(self):
         self.queue.put(self.response)
         threads = [Thread(target=self.requete,
@@ -143,7 +129,7 @@ class Requete():
             thread.join()
         return self.queue.get()
 
-    #Un thread récupère les informations, et les stocke dans la réponse, gérée par un verrou
+    # Un thread récupère les informations, et les stocke dans la réponse, gérée par un verrou
     @staticmethod
     def requete(querystring, item, verrou, queue, url):
         display = requests.request("GET", url, params=querystring).json()[item]
@@ -158,21 +144,21 @@ def login():
     """
     Route menant à la page d'identification
     """
-    #Si l'utilisateur est déjà identifié, renvoie à la page d'accueil
+    # Si l'utilisateur est déjà identifié, renvoie à la page d'accueil
     if current_user.is_authenticated:
         return redirect(url_for('home'))
 
-    #Sinon, récupère les données envoyées, les compare à la base de donnée
+    # Sinon, récupère les données envoyées, les compare à la base de donnée
     form = LoginForm()
     if form.validate_on_submit():
         user = User.query.filter_by(username=form.username.data).first()
-        #Si les identifiants ne sont pas bons on redirige vers la page de connexion
+        # Si les identifiants ne sont pas bons on redirige vers la page de connexion
         if user is None or not user.check_password(form.password.data):
             flash('Invalid username or password')
             return redirect(url_for('login'))
         login_user(user, remember=form.remember_me.data)
         next_page = request.args.get('next')
-        #On redirige vers la page appropriée une fois connecté : l'accueil si arrivé en tapant directement l'url, la page d'origine sinon
+        # On redirige vers la page appropriée une fois connecté : l'accueil si arrivé en tapant directement l'url, la page d'origine sinon
         if not next_page or url_parse(next_page).netloc != '':
             next_page = url_for('home')
         return redirect(next_page)
@@ -193,11 +179,11 @@ def register():
     """
     Route menant à la page d'inscription
     """
-    #Si l'utilisateur est déjà authentifié on retourne la page d'accueil
+    # Si l'utilisateur est déjà authentifié on retourne la page d'accueil
     if current_user.is_authenticated:
         return redirect(url_for('home'))
     form = RegistrationForm()
-    #Si le formulaire est correct on enregistre le nouvel utilisateur dans la base
+    # Si le formulaire est correct on enregistre le nouvel utilisateur dans la base
     if form.validate_on_submit():
         user = User(username=form.username.data, email=form.email.data)
         user.set_password(form.password.data)
@@ -221,25 +207,14 @@ def user(username):
     ]
     return render_template('user.html', user=user, posts=posts)
 
-import sqlite3
-
-def query_db(query, args=(), one=False):
-    """
-    Fonction utilitaire pour appeler la base de donnée
-    """
-    dbase = sqlite3.connect('app.db')
-    cur = dbase.execute(query, args)
-    rv = cur.fetchall()
-    cur.close()
-    return (rv[0] if rv else None) if one else rv
-
 @app.route('/my_list/')
 @login_required
 def my_list():
     """
     Route menant à la page de la liste des séries préférées
     """
-    liste = query_db('select * from liste_series where person_id = ? order by serie_name asc', args=(current_user.get_id()))
+    liste = query_db('select * from liste_series where person_id = ? order by serie_name asc',
+                     args=(current_user.get_id()))
 
     starting = request.args.get('starting', default=' ', type=str)
     page = request.args.get('page', default=1, type=int)
@@ -248,6 +223,8 @@ def my_list():
 
 from app.models import Notification
 from flask import jsonify
+
+
 @app.route('/notifications')
 @login_required
 def notifications():
@@ -273,7 +250,10 @@ API call : https://api.betaseries.com/episodes/next?key=7c2f686dfaad&v=3.0&id=19
         'timestamp': n.timestamp
     } for n in notifications])
 
+
 from datetime import datetime
+
+
 @app.route('/messages')
 @login_required
 def messages():
@@ -285,4 +265,28 @@ def messages():
     notifications = current_user.notifications.filter(
         Notification.timestamp > current_user.last_message_read_time).order_by(Notification.timestamp.asc())
     return render_template('messages.html', messages=notifications)
+
+# helpers
+
+def query_db(query, args=(), one=False):
+    """
+    Fonction utilitaire pour appeler la base de donnée
+    """
+    dbase = sqlite3.connect('app.db')
+    cur = dbase.execute(query, args)
+    rv = cur.fetchall()
+    cur.close()
+    return (rv[0] if rv else None) if one else rv
+
+def ajout(l):
+    s = [i[0] for i in query_db('select serie_id from liste_series where person_id=?', args=(current_user.get_id()))]
+    if int(l[0]) not in s:
+        serie_id = int(l[0])
+        serie_name = l[1]
+        serie_pictureurl = l[2]
+        serie = Liste_series(person_id=current_user.get_id(), serie_id=serie_id, serie_name=serie_name,
+                             serie_pictureurl=serie_pictureurl)
+        db.session.add(serie)
+        db.session.commit()
+
 
