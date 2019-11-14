@@ -6,10 +6,9 @@ from app.models import User, Liste_series
 from flask_login import current_user, login_user, logout_user, login_required
 from werkzeug.urls import url_parse
 
-#Enlever le bouton Add et Supp quand l'utilisateur n'est pas identifié, systematiser le bouton add, objectifier, documenter
 #Empecher l'ajout de série plusieurs fois et indiquer quand fait une fois (Add devient Supp)
-#Implémenter plus de colonnes dans l'objet my list (image etc)
 
+@app.route('/', methods=['GET', 'POST'])
 @app.route('/', methods=['GET', 'POST'])
 @app.route('/home/', methods=['GET', 'POST'])
 def home():
@@ -38,6 +37,7 @@ def home():
         bonjour = current_user.username
     return render_template('home.html', posts=posts, bonjour=bonjour)
 
+from ast import literal_eval
 @app.route('/series/', methods=['GET', 'POST'])
 def series():
     """
@@ -73,8 +73,12 @@ def series():
 
         #L'utilisateur identifié peut ajouter une nouvelle série à sa liste
         elif "button" in request.form:
-            serie_id = request.form.get('button')
-            serie = Liste_series(person_id=current_user.get_id(), name=serie_id)
+            l = literal_eval(request.form.get('button'))
+            print(l)
+            serie_id = int(l[0])
+            serie_name = l[1]
+            serie_pictureurl = l[2]
+            serie = Liste_series(person_id=current_user.get_id(), serie_id=serie_id, serie_name=serie_name, serie_pictureurl=serie_pictureurl)
             db.session.add(serie)
             db.session.commit()
             return (""), 204
@@ -231,7 +235,8 @@ def my_list():
     """
     Route menant à la page de la liste des séries préférées
     """
-    liste = query_db('select * from liste_series where person_id = ? order by name asc', args=(current_user.get_id()))
+    liste = query_db('select * from liste_series where person_id = ? order by serie_name asc', args=(current_user.get_id()))
+
     starting = request.args.get('starting', default=' ', type=str)
     page = request.args.get('page', default=1, type=int)
     return render_template('my_list.html', posts=liste, starting=starting, page=page)

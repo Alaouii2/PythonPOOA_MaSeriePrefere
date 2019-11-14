@@ -3,6 +3,7 @@ from app import db, login
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import UserMixin
 from time import time
+import json
 
 
 class User(UserMixin, db.Model):
@@ -54,7 +55,9 @@ def load_user(id):
 class Liste_series(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     person_id = db.Column(db.Integer, db.ForeignKey('user.id'))
-    name = db.Column(db.String(100))
+    serie_id = db.Column(db.Integer)
+    serie_name = db.Column(db.String(100))
+    serie_pictureurl = db.Column(db.String(100))
 
 # Setup the relationship to the User table
     users = db.relationship(User)

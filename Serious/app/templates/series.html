@@ -41,7 +41,7 @@
                                     <a href="{{ url_for('login') }}"><button name="button">Ajouter</button></a>
                                     {% else %}
 									<form action="" method="post">
-    									<button name="button" value="{{post.id}}">Ajouter</button>
+    									<button name="button" value="{{(post.id, post.title, post.images.show)}}">Ajouter</button>
 									</form>
                                     {% endif %}
 								</div>
