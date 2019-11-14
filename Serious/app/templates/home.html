@@ -31,11 +31,15 @@
 						<a href="{{ url_for('serie', serie_id=post.id)}}" class="read-more">Read More
 							<img src="{{ url_for('static', filename='img/icons/double-arrow.png')}}" alt="#"/></a>
 						<a href="{{ url_for('serie', serie_id=post.id)}}" class="read-more">
-							<img src={{ post.images.show }} alt="#"/></a>
-
-						<form action="" method="POST">
-    						<button name="button" value="{{serie_id}}">Ajouter</button>
-						</form>
+							<img src={{ post.images.show }} alt="#"/>
+                        </a>
+                        {% if current_user.is_anonymous %}
+                        <a href="{{ url_for('login') }}"><button name="button">Ajouter</button></a>
+                        {% else %}
+                        <form action="" method="post">
+                            <button name="button" value="{{(post.id, post.title, post.images.show)}}">Ajouter</button>
+                        </form>
+                        {% endif %}
 					</div>
 				</div>
 				{% endfor %}

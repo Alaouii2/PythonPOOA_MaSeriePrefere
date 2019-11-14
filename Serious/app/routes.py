@@ -9,7 +9,7 @@ import sqlite3
 from ast import literal_eval
 
 
-# Empecher l'ajout de série plusieurs fois et indiquer quand fait une fois (Add devient Supp)
+# indiquer quand fait une fois (Add devient Supp)
 
 @app.route('/', methods=['GET', 'POST'])
 @app.route('/home/', methods=['GET', 'POST'])
@@ -65,9 +65,10 @@ def series():
             for post in posts:
                 images_url = "https://api.betaseries.com/shows/pictures"
                 images = {"key": "7c2f686dfaad", "v": "3.0", "id": post["id"]}
-                picture_url = requests.request("GET", images_url, params=images).json()["pictures"]
+                pictures_url = requests.request("GET", images_url, params=images).json()["pictures"]
+                picture_url = [url for url in pictures_url if url['picked'] == 'show']
                 post['images'] = {
-                    'show': (picture_url[0]["url"] if picture_url else url_for('static', filename='img/logo.png'))}
+                    'show': (picture_url[0]['url'] if picture_url else url_for('static', filename='img/logo.png'))}
             return render_template('series.html', posts=posts, starting=None, page=None)
 
         # L'utilisateur identifié peut ajouter une nouvelle série à sa liste
