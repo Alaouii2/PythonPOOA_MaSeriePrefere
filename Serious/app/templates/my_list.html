@@ -15,9 +15,9 @@
 						{% for post in posts %}
 							<div class="col-lg-4 col-md-6">
 								<div class="game-item">
-									<a href="{{ url_for('serie', serie_id=post.id)}}" class="read-more">
+									<a href="{{ url_for('serie', serie_id=post[2])}}" class="read-more">
                                         {% if post[4]%}
-											<img src={{ post[4]}} alt="#"/>
+											<img src={{ post[4] }} alt="#"/>
 										{% endif %}
 									</a>
 
@@ -25,9 +25,10 @@
 									<a href="{{ url_for('serie', serie_id=post[2])}}" class="read-more">Read More
 										<img src="{{ url_for('static', filename='img/icons/double-arrow.png')}}" alt="#"/>
 									</a>
-
-									<button type="site-btn">Enlever</button>
-								</div>
+                                    <form action="" method="post">
+									    <button name="button" value="{{ post[2] }}">Enlever</button>
+                                    </form>
+                                </div>
 							</div>
 						{% endfor %}
 					</div>
