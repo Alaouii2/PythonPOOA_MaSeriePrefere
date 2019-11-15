@@ -260,7 +260,7 @@ API call : https://api.betaseries.com/episodes/next?key=7c2f686dfaad&v=3.0&id=19
         Notification.timestamp > since).order_by(Notification.timestamp.asc())
     return jsonify([{
         'name': n.name,
-        'data': n.get_data(),
+        'data': n.payload_json,
         'timestamp': n.timestamp
     } for n in notifications])
 
@@ -271,9 +271,9 @@ def messages():
     """
     Route menant à la page de notifications
     """
+
+    notifications = query_db('select * from Notification where timestamp > ? order by timestamp asc', args=(datetime(2012,10,10,10,10,10),))
     current_user.last_message_read_time = datetime.utcnow()
     db.session.commit()
-    notifications = current_user.notifications.filter(
-        Notification.timestamp > current_user.last_message_read_time).order_by(Notification.timestamp.asc())
     return render_template('messages.html', messages=notifications)
 

@@ -23,8 +23,8 @@ class User(UserMixin, db.Model):
         return check_password_hash(self.password_hash, password)
 
     def new_messages(self):
-        last_read_time = self.last_message_read_time or datetime(1900, 1, 1)
-        return 3
+        self.last_message_read_time = self.last_message_read_time or datetime(1900, 1, 1)
+        return Notification.query.filter(Notification.timestamp > datetime(2012,10,10,10,10,10)).count() #self.last_message_read_time
 
     def add_notification(self, name, data):
         self.notifications.filter_by(name=name).delete()
@@ -64,8 +64,8 @@ class Notification(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(128), index=True)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
-    timestamp = db.Column(db.Float, index=True, default=time)
+    timestamp = db.Column(db.DateTime, index=True, default=time)
     payload_json = db.Column(db.Text)
 
-    def get_data(self):
-        return json.loads(str(self.payload_json))
+    #def get_data(self):
+    #    return json.loads(str(self.payload_json))
