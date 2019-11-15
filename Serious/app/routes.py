@@ -9,8 +9,6 @@ import sqlite3
 from ast import literal_eval
 
 
-# indiquer quand fait une fois (Add devient Supp)
-
 @app.route('/', methods=['GET', 'POST'])
 @app.route('/home/', methods=['GET', 'POST'])
 def home():
@@ -271,13 +269,6 @@ API call : https://api.betaseries.com/episodes/next?key=7c2f686dfaad&v=3.0&id=19
     db.session.commit()
 
     return (""), 204
-    # notifications = current_user.notifications.filter(
-    #     Notification.timestamp > since).order_by(Notification.timestamp.asc())
-    # return jsonify([{
-    #     'name': n.name,
-    #     'data': n.payload_json,
-    #     'timestamp': n.timestamp
-    # } for n in notifications])
 
 
 from datetime import datetime
