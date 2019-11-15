@@ -94,7 +94,7 @@ def serie():
         return (""), 204
 
     # Appelle l'api pour récupérer les informations pertinentes
-    serie_id = request.args.get('serie_id', type=int)
+    serie_id = [request.args.get('serie_id', type=int) for i in range(3)]
     urls = ["https://api.betaseries.com/shows/episodes", "https://api.betaseries.com/shows/seasons",
             "https://api.betaseries.com/shows/display"]
     items = ["episodes", "seasons", "show"]
@@ -114,8 +114,9 @@ class Requete():
     Cette classe permet d'effectuer des api call en parallèle
     """
 
-    def __init__(self, serie_id, items, urls):
-        self.querystring = {"key": "7c2f686dfaad", "v": "3.0", "id": serie_id}
+    def __init__(self, serie_ids, items, urls):
+        self.serie_ids = serie_ids
+        self.querystrings = [{"key": "7c2f686dfaad", "v": "3.0", "id": serie_id} for serie_id in serie_ids]
         self.urls = urls
         self.items = items
         self.response = {}
@@ -128,8 +129,8 @@ class Requete():
     def run(self):
         self.queue.put(self.response)
         threads = [Thread(target=self.requete,
-                          args=(self.querystring, item, self.verrou, self.queue, url))
-                   for (item, url) in zip(self.items, self.urls)]
+                          args=(querystring, item, self.verrou, self.queue, url))
+                   for (querystring, item, url) in zip(self.querystrings, self.items, self.urls)]
         for thread in threads:
             thread.start()
         for thread in threads:
@@ -139,7 +140,10 @@ class Requete():
     # Un thread récupère les informations, et les stocke dans la réponse, gérée par un verrou
     @staticmethod
     def requete(querystring, item, verrou, queue, url):
-        display = requests.request("GET", url, params=querystring).json()[item]
+        try:
+            display = requests.request("GET", url, params=querystring).json()[item]
+        except:
+            display = None
         with verrou:
             a = queue.get()
             a[item] = display
@@ -252,14 +256,28 @@ def notifications():
 
 API call : https://api.betaseries.com/episodes/next?key=7c2f686dfaad&v=3.0&id=19
     """
-    since = request.args.get('since', 0.0, type=float)
-    notifications = current_user.notifications.filter(
-        Notification.timestamp > since).order_by(Notification.timestamp.asc())
-    return jsonify([{
-        'name': n.name,
-        'data': n.payload_json,
-        'timestamp': n.timestamp
-    } for n in notifications])
+    series = current_user.query.join(Liste_series).with_entities(Liste_series.serie_id).all()
+    series = [series[index][0] for index in range(len(series))]
+    urls = ["https://api.betaseries.com/episodes/next?key=7c2f686dfaad&v=3.0&id={}".format(serie) for serie in series]
+    requetes_series = Requete(series, ["episode" for i in range(len(series))], urls)
+    requetes = requetes_series.run()
+    for requete in requetes:
+        try:
+            h,m,s = map(int, requete['episode']['date'].split('-'))
+            notifications = Notification(user_id=current_user.get_id(), timestamp=datetime(h,m,s), name=requete['episode']['show']['title'], payload_json=requete['episode']['description'])
+            db.session.add(notifications)
+        except:
+            pass
+    db.session.commit()
+
+    return (""), 204
+    # notifications = current_user.notifications.filter(
+    #     Notification.timestamp > since).order_by(Notification.timestamp.asc())
+    # return jsonify([{
+    #     'name': n.name,
+    #     'data': n.payload_json,
+    #     'timestamp': n.timestamp
+    # } for n in notifications])
 
 
 from datetime import datetime
@@ -310,5 +328,4 @@ def dans_maliste(post):
         return 'Enlever'
     else:
         return 'Ajouter'
-
 

@@ -25,7 +25,7 @@ class User(UserMixin, db.Model):
 
     def new_messages(self):
         self.last_message_read_time = self.last_message_read_time or datetime(1900, 1, 1)
-        return Notification.query.filter(Notification.timestamp > datetime(2012,10,10,10,10,10)).count() #self.last_message_read_time
+        return Notification.query.filter(Notification.timestamp > self.last_message_read_time).count()
 
     def add_notification(self, name, data):
         self.notifications.filter_by(name=name).delete()
