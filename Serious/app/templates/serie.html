@@ -9,9 +9,13 @@
 			</div>
 
 			<div class="row">
-				<form action="" method="POST">
-    				<button name="button" value="{{serie_id}}">Ajouter</button>
+				{% if current_user.is_anonymous %}
+				<a href="{{ url_for('login') }}"><button name="button">{{ ajouter }}</button></a>
+				{% else %}
+				<form action="" method="post">
+					<button name="button" value="{{(serie_id, display.title, display.images.show)}}">{{ ajouter }}</button>
 				</form>
+				{% endif %}
 				<div class="col-xl-9 col-lg-8 col-md-7 game-single-content">
 						<h2 class="gs-title">{{ display.title }}</h2>
 						<p>{{ display.description }}</p>

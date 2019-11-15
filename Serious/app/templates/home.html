@@ -34,10 +34,10 @@
 							<img src={{ post.images.show }} alt="#"/>
                         </a>
                         {% if current_user.is_anonymous %}
-                        <a href="{{ url_for('login') }}"><button name="button">Ajouter</button></a>
+                        <a href="{{ url_for('login') }}"><button name="button">{{post.ajout}}</button></a>
                         {% else %}
                         <form action="" method="post">
-                            <button name="button" value="{{(post.id, post.title, post.images.show)}}">Ajouter</button>
+                            <button name="button" value="{{(post.id, post.title, post.images.show)}}">{{post.ajout}}</button>
                         </form>
                         {% endif %}
 					</div>

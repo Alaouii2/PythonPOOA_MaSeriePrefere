@@ -27,8 +27,11 @@ def home():
     querystring = {"key": "7c2f686dfaad", "v": "3.0", "nb": "3"}
     posts = requests.request("GET", url, params=querystring).json()["shows"]
     for post in posts:
+        if len(post.keys()) == 2:
+            post['images'] = {'show': url_for('static', filename='img/logo.png')}
         if len(post["description"]) > 500:
             post["description"] = post["description"][:500] + "..."
+        post['ajout'] = dans_maliste(post)
     bonjour = ""
 
     # Si l'utilisateur est authentifié, affiche son nom dans le message de bienvenue
@@ -97,7 +100,8 @@ def serie():
     items = ["episodes", "seasons", "show"]
     requete_serie = Requete(serie_id, items, urls)
     response = requete_serie.run()
-    return render_template('serie.html', serie_id=serie_id, episodes=response["episodes"], saisons=response["seasons"],
+    ajouter = dans_maliste({'id': serie_id})
+    return render_template('serie.html', serie_id=serie_id, ajouter=ajouter, episodes=response["episodes"], saisons=response["seasons"],
                            display=response["show"])
 
 
@@ -217,14 +221,12 @@ def my_list():
     Route menant à la page de la liste des séries préférées
     """
     if request.method == 'POST':
-        print('post')
         serie_id = int(request.form.get('button'))
-        print(serie_id)
         Liste_series.query.filter_by(serie_id=serie_id).delete()
         db.session.commit()
         return (""), 204
     liste = query_db('select * from liste_series where person_id = ? order by serie_name asc',
-                     args=(current_user.get_id()))
+                     args=(current_user.get_id(),))
     starting = request.args.get('starting', default=' ', type=str)
     page = request.args.get('page', default=1, type=int)
     return render_template('my_list.html', posts=liste, starting=starting, page=page)
@@ -288,7 +290,7 @@ def query_db(query, args=(), one=False):
     return (rv[0] if rv else None) if one else rv
 
 def ajout(l):
-    s = [i[0] for i in query_db('select serie_id from liste_series where person_id=?', args=(current_user.get_id()))]
+    s = [i[0] for i in query_db('select serie_id from liste_series where person_id=?', args=(current_user.get_id(),))]
     serie_id = int(l[0])
     if serie_id not in s:
         serie_name = l[1]
@@ -303,7 +305,7 @@ def ajout(l):
 
 
 def dans_maliste(post):
-    s = [i[0] for i in query_db('select serie_id from liste_series where person_id=?', args=(current_user.get_id()))]
+    s = [i[0] for i in query_db('select serie_id from liste_series where person_id=?', args=(current_user.get_id(),))]
     if post['id'] in s:
         return 'Enlever'
     else:
