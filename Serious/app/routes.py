@@ -96,7 +96,7 @@ def serie():
     urls = ["https://api.betaseries.com/shows/episodes", "https://api.betaseries.com/shows/seasons",
             "https://api.betaseries.com/shows/display"]
     items = ["episodes", "seasons", "show"]
-    requete_serie = Requete(serie_id, items, urls)
+    requete_serie = Requete(serie_id, items, urls, items)
     response = requete_serie.run()
     ajouter = dans_maliste({'id': serie_id})
     return render_template('serie.html', serie_id=serie_id, ajouter=ajouter, episodes=response["episodes"], saisons=response["seasons"],
@@ -112,7 +112,7 @@ class Requete():
     Cette classe permet d'effectuer des api call en parallèle
     """
 
-    def __init__(self, serie_ids, items, urls):
+    def __init__(self, serie_ids, items, urls, names):
         self.serie_ids = serie_ids
         self.querystrings = [{"key": "7c2f686dfaad", "v": "3.0", "id": serie_id} for serie_id in serie_ids]
         self.urls = urls
@@ -120,15 +120,16 @@ class Requete():
         self.response = {}
         self.queue = Queue()
         self.verrou = RLock()
-        for item in items:
-            self.response[item] = ""
+        self.names = names
+        for name in self.names:
+            self.response[name] = ""
 
     # Crée et lance des thread en parallèle
     def run(self):
         self.queue.put(self.response)
         threads = [Thread(target=self.requete,
-                          args=(querystring, item, self.verrou, self.queue, url))
-                   for (querystring, item, url) in zip(self.querystrings, self.items, self.urls)]
+                          args=(querystring, item, self.verrou, self.queue, url, name))
+                   for (querystring, item, url, name) in zip(self.querystrings, self.items, self.urls, self.names)]
         for thread in threads:
             thread.start()
         for thread in threads:
@@ -137,14 +138,14 @@ class Requete():
 
     # Un thread récupère les informations, et les stocke dans la réponse, gérée par un verrou
     @staticmethod
-    def requete(querystring, item, verrou, queue, url):
+    def requete(querystring, item, verrou, queue, url, name):
         try:
             display = requests.request("GET", url, params=querystring).json()[item]
         except:
             display = None
         with verrou:
             a = queue.get()
-            a[item] = display
+            a[name] = display
             queue.put(a)
 
 
@@ -254,15 +255,18 @@ def notifications():
 
 API call : https://api.betaseries.com/episodes/next?key=7c2f686dfaad&v=3.0&id=19
     """
+    #Récupère la liste de série préférée de l'utilisateur et effectue une requete api pour chaque série
     series = current_user.query.join(Liste_series).with_entities(Liste_series.serie_id).all()
     series = [series[index][0] for index in range(len(series))]
     urls = ["https://api.betaseries.com/episodes/next?key=7c2f686dfaad&v=3.0&id={}".format(serie) for serie in series]
-    requetes_series = Requete(series, ["episode" for i in range(len(series))], urls)
+    requetes_series = Requete(series, ["episode" for i in range(len(series))], urls, series)
     requetes = requetes_series.run()
-    for requete in requetes:
+    #Nettoyage de la réponse : passage en datetime et ecriture dans la base notification
+    for i in requetes:
+        print(requetes[i])
         try:
-            h,m,s = map(int, requete['episode']['date'].split('-'))
-            notifications = Notification(user_id=current_user.get_id(), timestamp=datetime(h,m,s), name=requete['episode']['show']['title'], payload_json=requete['episode']['description'])
+            h,m,s = map(int, requetes[i]['date'].split('-'))
+            notifications = Notification(user_id=current_user.get_id(), timestamp=datetime(h,m,s), name=requetes[i]['show']['title'], payload_json=requetes[i]['description'])
             db.session.add(notifications)
         except:
             pass

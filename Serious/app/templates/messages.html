@@ -10,8 +10,9 @@
 
         <div class="container game-single-content">
         {% for post in messages %}
-            <h2 class="text-white">Titre série {{post[4]}} - N°série N°épisode {{post[1]}}</h2>
-            <p>Date diffusion {{post[3]}}</p>
+            <h2 class="text-white">{{post[1]}} - N°saison N°épisode</h2>
+            <h5 style="color: white">Date diffusion {{post[3][:10]}}</h5>
+            <p>{{post[4]}}</p>
         {% endfor %}
         </div>
     </section>
