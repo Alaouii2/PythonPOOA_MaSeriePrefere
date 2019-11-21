@@ -280,7 +280,9 @@ def messages():
     notifications = query_db('select * from notification where date_diffusion > ? order by date_diffusion asc', args=(datetime(2012, 10, 10, 10, 10, 10),))
     current_user.last_message_read_time = datetime.utcnow()
     db.session.commit()
-    return render_template('messages.html', messages=notifications)
+    colonnes = ['id', 'serie_name', 'serie_id', 'user_id', 'date_diffusion', 'description', 'episode_id']
+    result = {colonne:notification for colonne, notification in zip(colonnes, notifications)}
+    return render_template('messages.html', messages=result)
 
 # helpers
 
@@ -306,9 +308,7 @@ def ajout(l):
         db.session.commit()
     else:
         Liste_series.query.filter_by(serie_id=serie_id, person_id=current_user.get_id()).delete()
-        print(Liste_series.query.filter_by(serie_id=serie_id, person_id=current_user.get_id()))
         Notification.query.filter_by(serie_id=serie_id, user_id=current_user.get_id()).delete()
-
         db.session.commit()
 
 
