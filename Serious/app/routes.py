@@ -99,7 +99,7 @@ def serie():
     requete_serie = Requete(serie_id, items, urls, items)
     response = requete_serie.run()
     ajouter = dans_maliste({'id': serie_id})
-    return render_template('serie.html', serie_id=serie_id, ajouter=ajouter, episodes=response["episodes"], saisons=response["seasons"],
+    return render_template('serie.html', serie_id=serie_id[0], ajouter=ajouter, episodes=response["episodes"], saisons=response["seasons"],
                            display=response["show"])
 
 
@@ -263,7 +263,6 @@ API call : https://api.betaseries.com/episodes/next?key=7c2f686dfaad&v=3.0&id=19
     requetes = requetes_series.run()
     #Nettoyage de la réponse : passage en datetime et ecriture dans la base notification
     for i in requetes:
-        print(requetes[i])
         try:
             h,m,s = map(int, requetes[i]['date'].split('-'))
             notifications = Notification(user_id=current_user.get_id(), timestamp=datetime(h,m,s), name=requetes[i]['show']['title'], payload_json=requetes[i]['description'])
