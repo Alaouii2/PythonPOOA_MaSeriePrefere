@@ -39,9 +39,11 @@
                                     {% if current_user.is_anonymous %}
                                     <a href="{{ url_for('login') }}"><button name="button">{{ post.ajout }}</button></a>
                                     {% else %}
-									<form action="" method="post">
-    									<button name="button" value="{{(post.id, post.title, post.images.show)}}">{{ post.ajout }}</button>
+                                    <div id="switch">
+									<form name="theform" action="" method="post">
+    									<button name="button" value="{{(post.id, post.title, post.images.show)}}" onclick="sw();">{{ post.ajout }}</button>
 									</form>
+                                    </div>
                                     {% endif %}
 								</div>
 							</div>

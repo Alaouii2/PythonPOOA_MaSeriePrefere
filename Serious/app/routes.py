@@ -107,7 +107,7 @@ from threading import Thread, RLock
 from queue import Queue
 
 
-class Requete():
+class Requete:
     """
     Cette classe permet d'effectuer des api call en parallèle
     """
@@ -224,9 +224,8 @@ def my_list():
     Route menant à la page de la liste des séries préférées
     """
     if request.method == 'POST':
-        serie_id = int(request.form.get('button'))
-        Liste_series.query.filter_by(serie_id=serie_id).delete()
-        db.session.commit()
+        l = literal_eval(request.form.get('button'))
+        ajout(l)
         return (""), 204
     liste = query_db('select * from liste_series where person_id = ? order by serie_name asc',
                      args=(current_user.get_id(),))
@@ -258,7 +257,7 @@ def notifications():
         try:
             if requetes[i]['id'] not in s:
                 h,m,s = map(int, requetes[i]['date'].split('-'))
-                notifications = Notification(user_id=current_user.get_id(), serie_id=requetes[i]['show']['id'], date_diffusion=datetime(h,m,s), serie_name=requetes[i]['show']['title'], description=requetes[i]['description'], episode_id=requetes[i]['id'])
+                notifications = Notification(user_id=current_user.get_id(), serie_id=requetes[i]['show']['id'], date_diffusion=datetime(h,m,s), serie_name=requetes[i]['show']['title'], description=requetes[i]['description'], episode_id=requetes[i]['id'], code=requetes[i]['code'], title=requetes[i]['title'])
                 db.session.add(notifications)
         except:
             pass

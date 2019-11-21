@@ -60,6 +60,8 @@ class Notification(db.Model):
     date_diffusion = db.Column(db.DateTime, default=time)
     description = db.Column(db.Text)
     episode_id = db.Column(db.Integer)
+    code = db.Column(db.String(40), index=True)
+    title = db.Column(db.Text)
 
     #def get_data(self):
     #    return json.loads(str(self.payload_json))

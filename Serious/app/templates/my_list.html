@@ -25,9 +25,11 @@
 									<a href="{{ url_for('serie', serie_id=post[2])}}" class="read-more">Read More
 										<img src="{{ url_for('static', filename='img/icons/double-arrow.png')}}" alt="#"/>
 									</a>
-                                    <form action="" method="post">
-									    <button name="button" value="{{ post[2] }}">Enlever</button>
-                                    </form>
+                                    <div id="switch">
+                                    <form name="theform" action="" method="post">
+    									<button name="button" value="{{(post[2], post[3], post[4])}}" onclick="sw();">Enlever</button>
+									</form>
+                                    </div>
                                 </div>
 							</div>
 						{% endfor %}
