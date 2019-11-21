@@ -11,7 +11,6 @@ class User(UserMixin, db.Model):
     username = db.Column(db.String(64), index=True, unique=True)
     email = db.Column(db.String(120), index=True, unique=True)
     password_hash = db.Column(db.String(128))
-    posts = db.relationship('Post', backref='author', lazy='dynamic')
     series = db.relationship('Liste_series', backref='user', lazy='dynamic')
     notifications = db.relationship('Notification', backref='user',
                                     lazy='dynamic')
@@ -37,16 +36,6 @@ class User(UserMixin, db.Model):
         return '<User {}>'.format(self.username)
 
 
-class Post(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    body = db.Column(db.String(140))
-    timestamp = db.Column(db.DateTime, index=True, default=datetime.utcnow)
-    user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
-
-    def __repr__(self):
-        return '<Post {}>'.format(self.body)
-
-
 @login.user_loader
 def load_user(id):
     return User.query.get(int(id))
@@ -67,10 +56,12 @@ class Notification(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     serie_name = db.Column(db.String(128))
     serie_id = db.Column(db.Integer)
-    user_id = db.Column(db.Integer, db.ForeignKey('user.username'))
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
     date_diffusion = db.Column(db.DateTime, default=time)
     description = db.Column(db.Text)
     episode_id = db.Column(db.Integer)
+    code = db.Column(db.String(40), index=True)
+    title = db.Column(db.Text)
 
     #def get_data(self):
     #    return json.loads(str(self.payload_json))
