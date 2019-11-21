@@ -98,7 +98,7 @@ def serie():
     items = ["episodes", "seasons", "show"]
     requete_serie = Requete(serie_id, items, urls, items)
     response = requete_serie.run()
-    ajouter = dans_maliste({'id': serie_id})
+    ajouter = dans_maliste({'id': serie_id[0]})
     return render_template('serie.html', serie_id=serie_id[0], ajouter=ajouter, episodes=response["episodes"], saisons=response["seasons"],
                            display=response["show"])
 
@@ -279,8 +279,9 @@ def messages():
     notifications = query_db('select * from notification where date_diffusion > ? order by date_diffusion asc', args=(datetime(2012, 10, 10, 10, 10, 10),))
     current_user.last_message_read_time = datetime.utcnow()
     db.session.commit()
-    colonnes = ['id', 'serie_name', 'serie_id', 'user_id', 'date_diffusion', 'description', 'episode_id']
-    result = {colonne:notification for colonne, notification in zip(colonnes, notifications)}
+    colonnes = ['id', 'user_id', 'date_diffusion', 'description', 'episode_id', 'serie_name', 'serie_id', 'code', 'title']
+    result = [{colonne:i for colonne, i in zip(colonnes, notification)} for notification in notifications]
+    print(result)
     return render_template('messages.html', messages=result)
 
 # helpers
