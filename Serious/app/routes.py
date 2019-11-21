@@ -244,17 +244,8 @@ from flask import jsonify
 def notifications():
     """
     Route activant le processus de rappatriement des nouvelles séries
-
-    TODO : Ajd la fonction vérifie régulièrement le contenu des notifications pour prendre celles
-    qui ont time stamp récent et qui n'ont pas encore été vues.
-    Ce qu'on veut faire c'est call l'api de betaseries tout les jours à une heure définie
-    (en fait non : si rajout d'une série, l'api call doit etre fait)
-    (en fait on peut faire les deux : ca + dès qu'un rajout)
-     pour prendre les séries des 8 prochains jours, mettre les nouvelles dans les notif
-     puis les appeler et renvoyer les recentes non vues.
-
-API call : https://api.betaseries.com/episodes/next?key=7c2f686dfaad&v=3.0&id=19
     """
+
     #Récupère la liste de série préférée de l'utilisateur et effectue une requete api pour chaque série
     series = current_user.query.join(Liste_series).with_entities(Liste_series.serie_id).all()
     series = [series[index][0] for index in range(len(series))]
@@ -263,13 +254,11 @@ API call : https://api.betaseries.com/episodes/next?key=7c2f686dfaad&v=3.0&id=19
     requetes = requetes_series.run()
     #Nettoyage de la réponse : passage en datetime et ecriture dans la base notification
     s = [i[0] for i in query_db('select episode_id from notification where user_id=?', args=(current_user.get_id(),))]
-    print(s)
-    print(requetes)
     for i in requetes:
         try:
             if requetes[i]['id'] not in s:
                 h,m,s = map(int, requetes[i]['date'].split('-'))
-                notifications = Notification(user_id=current_user.get_id(), date_diffusion=datetime(h,m,s), serie_name=requetes[i]['show']['title'], description=requetes[i]['description'], episode_id=requetes[i]['id'])
+                notifications = Notification(user_id=current_user.get_id(), serie_id=requetes[i]['show']['id'], date_diffusion=datetime(h,m,s), serie_name=requetes[i]['show']['title'], description=requetes[i]['description'], episode_id=requetes[i]['id'])
                 db.session.add(notifications)
         except:
             pass
@@ -288,7 +277,7 @@ def messages():
     Route menant à la page de notifications
     """
 
-    notifications = query_db('select * from Notification where date_diffusion > ? order by date_diffusion asc', args=(datetime(2012,10,10,10,10,10),))
+    notifications = query_db('select * from notification where date_diffusion > ? order by date_diffusion asc', args=(datetime(2012, 10, 10, 10, 10, 10),))
     current_user.last_message_read_time = datetime.utcnow()
     db.session.commit()
     return render_template('messages.html', messages=notifications)
@@ -316,7 +305,10 @@ def ajout(l):
         db.session.add(serie)
         db.session.commit()
     else:
-        Liste_series.query.filter_by(serie_id=serie_id).delete()
+        Liste_series.query.filter_by(serie_id=serie_id, person_id=current_user.get_id()).delete()
+        print(Liste_series.query.filter_by(serie_id=serie_id, person_id=current_user.get_id()))
+        Notification.query.filter_by(serie_id=serie_id, user_id=current_user.get_id()).delete()
+
         db.session.commit()
 
 

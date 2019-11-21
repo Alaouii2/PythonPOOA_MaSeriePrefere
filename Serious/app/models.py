@@ -65,8 +65,9 @@ class Liste_series(db.Model):
 
 class Notification(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    serie_name = db.Column(db.String(128), index=True)
-    user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
+    serie_name = db.Column(db.String(128))
+    serie_id = db.Column(db.Integer)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.username'))
     date_diffusion = db.Column(db.DateTime, default=time)
     description = db.Column(db.Text)
     episode_id = db.Column(db.Integer)
