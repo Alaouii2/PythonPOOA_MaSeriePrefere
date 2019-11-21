@@ -262,11 +262,15 @@ API call : https://api.betaseries.com/episodes/next?key=7c2f686dfaad&v=3.0&id=19
     requetes_series = Requete(series, ["episode" for i in range(len(series))], urls, series)
     requetes = requetes_series.run()
     #Nettoyage de la réponse : passage en datetime et ecriture dans la base notification
+    s = [i[0] for i in query_db('select episode_id from notification where user_id=?', args=(current_user.get_id(),))]
+    print(s)
+    print(requetes)
     for i in requetes:
         try:
-            h,m,s = map(int, requetes[i]['date'].split('-'))
-            notifications = Notification(user_id=current_user.get_id(), timestamp=datetime(h,m,s), name=requetes[i]['show']['title'], payload_json=requetes[i]['description'])
-            db.session.add(notifications)
+            if requetes[i]['id'] not in s:
+                h,m,s = map(int, requetes[i]['date'].split('-'))
+                notifications = Notification(user_id=current_user.get_id(), date_diffusion=datetime(h,m,s), serie_name=requetes[i]['show']['title'], description=requetes[i]['description'], episode_id=requetes[i]['id'])
+                db.session.add(notifications)
         except:
             pass
     db.session.commit()
@@ -284,7 +288,7 @@ def messages():
     Route menant à la page de notifications
     """
 
-    notifications = query_db('select * from Notification where timestamp > ? order by timestamp asc', args=(datetime(2012,10,10,10,10,10),))
+    notifications = query_db('select * from Notification where date_diffusion > ? order by date_diffusion asc', args=(datetime(2012,10,10,10,10,10),))
     current_user.last_message_read_time = datetime.utcnow()
     db.session.commit()
     return render_template('messages.html', messages=notifications)

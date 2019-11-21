@@ -25,11 +25,11 @@ class User(UserMixin, db.Model):
 
     def new_messages(self):
         self.last_message_read_time = self.last_message_read_time or datetime(1900, 1, 1)
-        return Notification.query.filter(Notification.timestamp > self.last_message_read_time).count()
+        return Notification.query.filter(Notification.date_diffusion > self.last_message_read_time).count()
 
     def add_notification(self, name, data):
         self.notifications.filter_by(name=name).delete()
-        n = Notification(name=name, payload_json=json.dumps(data), user=self)
+        n = Notification(serie_name=name, description=json.dumps(data), user=self)
         db.session.add(n)
         return n
 
@@ -65,10 +65,11 @@ class Liste_series(db.Model):
 
 class Notification(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(128), index=True)
+    serie_name = db.Column(db.String(128), index=True)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
-    timestamp = db.Column(db.DateTime, index=True, default=time)
-    payload_json = db.Column(db.Text)
+    date_diffusion = db.Column(db.DateTime, default=time)
+    description = db.Column(db.Text)
+    episode_id = db.Column(db.Integer)
 
     #def get_data(self):
     #    return json.loads(str(self.payload_json))
