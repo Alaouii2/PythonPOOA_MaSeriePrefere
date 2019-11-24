@@ -91,42 +91,9 @@ class BaseView(FlaskView):
         cur.close()
         return (rv[0] if rv else None) if one else rv
 
-    @app.route('/notifications')
-    @login_required
-    def notifications(self):
-        """
-        Route activant le processus de rappatriement des nouvelles séries
-        """
-
-        # Récupère la liste de série préférée de l'utilisateur et effectue une requete api pour chaque série
-        series = current_user.query.join(Liste_series).with_entities(Liste_series.serie_id).all()
-        series = [series[index][0] for index in range(len(series))]
-        urls = ["https://api.betaseries.com/episodes/next?key=7c2f686dfaad&v=3.0&id={}".format(serie) for serie in
-                series]
-        requetes_series = Requete(series, ["episode" for i in range(len(series))], urls, series)
-        requetes = requetes_series.run()
-        # Nettoyage de la réponse : passage en datetime et ecriture dans la base notification
-        s = [i[0] for i in
-             self.querydb('select episode_id from notification where user_id=?', args=(current_user.get_id(),))]
-        for i in requetes:
-            try:
-                if requetes[i]['id'] not in s:
-                    h, m, s = map(int, requetes[i]['date'].split('-'))
-                    notifications = Notification(user_id=current_user.get_id(), serie_id=requetes[i]['show']['id'],
-                                                 date_diffusion=datetime(h, m, s),
-                                                 serie_name=requetes[i]['show']['title'],
-                                                 description=requetes[i]['description'], episode_id=requetes[i]['id'],
-                                                 code=requetes[i]['code'], title=requetes[i]['title'])
-                    db.session.add(notifications)
-            except:
-                pass
-        db.session.commit()
-
-        return (""), 204
-
 
 class SerieView(BaseView):
-    @app.route('/serie/', methods=["GET", "POST"])
+    @route('/serie/', methods=["GET", "POST"])
     def serie(self):
         """
         Route menant au descriptif d'une série
@@ -151,7 +118,7 @@ class SerieView(BaseView):
 
 
 class SeriesView(BaseView):
-    @app.route('/series/', methods=['GET', 'POST'])
+    @route('/series/', methods=['GET', 'POST'])
     def series(self):
         """
         Route menant à la liste de séries disponibles
@@ -199,6 +166,39 @@ class NotificationsView(BaseView):
 
     decorators = [login_required]
 
+    @route('/notifications')
+    @login_required
+    def notifications(self):
+        """
+        Route activant le processus de rappatriement des nouvelles séries
+        """
+
+        # Récupère la liste de série préférée de l'utilisateur et effectue une requete api pour chaque série
+        series = current_user.query.join(Liste_series).with_entities(Liste_series.serie_id).all()
+        series = [series[index][0] for index in range(len(series))]
+        urls = ["https://api.betaseries.com/episodes/next?key=7c2f686dfaad&v=3.0&id={}".format(serie) for serie in
+                series]
+        requetes_series = Requete(series, ["episode" for i in range(len(series))], urls, series)
+        requetes = requetes_series.run()
+        # Nettoyage de la réponse : passage en datetime et ecriture dans la base notification
+        s = [i[0] for i in
+             self.querydb('select episode_id from notification where user_id=?', args=(current_user.get_id(),))]
+        for i in requetes:
+            try:
+                if requetes[i]['id'] not in s:
+                    h, m, s = map(int, requetes[i]['date'].split('-'))
+                    notifications = Notification(user_id=current_user.get_id(), serie_id=requetes[i]['show']['id'],
+                                                 date_diffusion=datetime(h, m, s),
+                                                 serie_name=requetes[i]['show']['title'],
+                                                 description=requetes[i]['description'], episode_id=requetes[i]['id'],
+                                                 code=requetes[i]['code'], title=requetes[i]['title'])
+                    db.session.add(notifications)
+            except:
+                pass
+        db.session.commit()
+
+        return (""), 204
+
     @route('/', endpoint='messages')
     def index(self):
         """
@@ -217,7 +217,7 @@ class NotificationsView(BaseView):
 
 class MyListView(BaseView):
 
-    @app.route('/', methods=['GET', 'POST'], endpoint='my_list')
+    @route('/', methods=['GET', 'POST'], endpoint='my_list')
     @login_required
     def index(self):
         """
@@ -243,7 +243,7 @@ class HomeView(BaseView):
         # L'utilisateur identifié peut ajouter une nouvelle série à sa liste
         if request.method == 'POST':
             l = literal_eval(request.form.get('button'))
-            ajout(l)
+            self.ajout(l)
             return (""), 204
         # Page d'accueil, affiche 3 séries au hasard
         url = "https://api.betaseries.com/shows/random"
@@ -264,7 +264,7 @@ class HomeView(BaseView):
 
 
 class LoggerView(BaseView):
-    @app.route('/login', methods=['GET', 'POST'])
+    @route('/login', methods=['GET', 'POST'])
     def login(self):
         """
         Route menant à la page d'identification
@@ -280,26 +280,26 @@ class LoggerView(BaseView):
             # Si les identifiants ne sont pas bons on redirige vers la page de connexion
             if user is None or not user.check_password(form.password.data):
                 flash('Invalid username or password')
-                return redirect(url_for('login'))
+                return redirect(url_for('LoggerView:login'))
             login_user(user, remember=form.remember_me.data)
             next_page = request.args.get('next')
             # On redirige vers la page appropriée une fois connecté : l'accueil si arrivé en tapant directement l'url, la page d'origine sinon
             if not next_page or url_parse(next_page).netloc != '':
-                next_page = url_for('home')
+                next_page = url_for('index')
             return redirect(next_page)
         return render_template('login.html', title='Sign In', form=form)
 
 
-    @app.route('/logout')
+    @route('/logout')
     def logout(self):
         """
         Route activant la déconnexion
         """
         logout_user()
-        return redirect(url_for('home'))
+        return redirect(url_for('index'))
 
 
-    @app.route('/register', methods=['GET', 'POST'])
+    @route('/register', methods=['GET', 'POST'])
     def registering(self):
         """
         Route menant à la page d'inscription
@@ -315,7 +315,7 @@ class LoggerView(BaseView):
             db.session.add(user)
             db.session.commit()
             flash('Congratulations, you are now a registered user!')
-            return redirect(url_for('login'))
+            return redirect(url_for('LoggerView:login'))
         return render_template('register.html', title='Register', form=form)
 
 

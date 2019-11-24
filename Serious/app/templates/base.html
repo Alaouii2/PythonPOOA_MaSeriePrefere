@@ -52,10 +52,10 @@
 					<nav class="top-nav-area w-100">
 					<div class="user-panel">
                         {% if current_user.is_anonymous %}
-						<a href="{{ url_for('login')}}">Login</a>/
-						<a href="{{ url_for('register')}}">Register</a>
+						<a href="{{ url_for('LoggerView:login')}}">Login</a>/
+						<a href="{{ url_for('LoggerView:registering')}}">Register</a>
                         {% else %}
-                         <a href="{{ url_for('logout')}}">Logout</a>
+                         <a href="{{ url_for('LoggerView:logout')}}">Logout</a>
                         {% endif %}
 					</div>
 
@@ -63,7 +63,7 @@
 						<!-- Menu -->
 						<ul class="main-menu primary-menu">
 							<li><a href="{{ url_for('index')}}">Accueil</a></li>
-							<li><a href="{{ url_for('series', starting=' ', page=1)}}">Séries</a></li>
+							<li><a href="{{ url_for('SeriesView:series', starting=' ', page=1)}}">Séries</a></li>
                             {% if not current_user.is_anonymous %}
 							<li><a href="{{ url_for('my_list', starting=' ', page=1)}}">Ma Liste</a></li>
 							<li><a href="{{ url_for('messages') }}">Notifications
@@ -130,7 +130,7 @@
         $(function() {
             var since = 0;
             setInterval(function() {
-                $.ajax("{{ url_for('notifications') }}?since=" + since).done(
+                $.ajax("{{ url_for('NotificationsView:notifications') }}?since=" + since).done(
                     function(notifications) {
                         for (var i = 0; i < notifications.length; i++) {
                             if (notifications[i].name == 'unread_message_count')

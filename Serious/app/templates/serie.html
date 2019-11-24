@@ -10,7 +10,7 @@
 
 			<div class="row">
 				{% if current_user.is_anonymous %}
-				<a href="{{ url_for('login') }}"><button name="button">{{ ajouter }}</button></a>
+				<a href="{{ url_for('LoggerView:login') }}"><button name="button">{{ ajouter }}</button></a>
 				{% else %}
 				<form action="" method="post">
 					<button name="button" value="{{(serie_id, display.title, display.images.show)}}">{{ ajouter }}</button>
