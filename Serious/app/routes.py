@@ -1,4 +1,4 @@
-from flask import render_template, flash, redirect, url_for, request, session
+from flask import render_template, flash, redirect, url_for, request
 import requests
 from app import app, db
 from app.forms import LoginForm, RegistrationForm
@@ -11,39 +11,146 @@ from ast import literal_eval
 from flask_classful import FlaskView, route
 from threading import Thread, RLock
 from queue import Queue
-from flask.ext.session import Session
 
 
-class RoutesView(FlaskView):
-    @route('/', methods=['GET', 'POST'])
-    @route('/home/', methods=['GET', 'POST'])
-    def index(self):
+class Requete:
+    """
+    Cette classe permet d'effectuer des api call en parallèle
+    """
+
+    def __init__(self, serie_ids, items, urls, names):
+        self.serie_ids = serie_ids
+        self.querystrings = [{"key": "7c2f686dfaad", "v": "3.0", "id": serie_id} for serie_id in serie_ids]
+        self.urls = urls
+        self.items = items
+        self.response = {}
+        self.queue = Queue()
+        self.verrou = RLock()
+        self.names = names
+        for name in self.names:
+            self.response[name] = ""
+
+    # Crée et lance des thread en parallèle
+    def run(self):
+        self.queue.put(self.response)
+        threads = [Thread(target=self.requete,
+                          args=(querystring, item, self.verrou, self.queue, url, name))
+                   for (querystring, item, url, name) in zip(self.querystrings, self.items, self.urls, self.names)]
+        for thread in threads:
+            thread.start()
+        for thread in threads:
+            thread.join()
+        return self.queue.get()
+
+    # Un thread récupère les informations, et les stocke dans la réponse, gérée par un verrou
+    @staticmethod
+    def requete(querystring, item, verrou, queue, url, name):
+        try:
+            display = requests.request("GET", url, params=querystring).json()[item]
+        except:
+            display = None
+        with verrou:
+            a = queue.get()
+            a[name] = display
+            queue.put(a)
+
+
+class BaseView(FlaskView):
+
+    def ajout(self, l):
+        s = [i[0] for i in
+             self.querydb('select serie_id from liste_series where person_id=?', args=(current_user.get_id(),))]
+        serie_id = int(l[0])
+        if serie_id not in s:
+            serie_name = l[1]
+            serie_pictureurl = l[2]
+            serie = Liste_series(person_id=current_user.get_id(), serie_id=serie_id, serie_name=serie_name,
+                                 serie_pictureurl=serie_pictureurl)
+            db.session.add(serie)
+            db.session.commit()
+        else:
+            Liste_series.query.filter_by(serie_id=serie_id, person_id=current_user.get_id()).delete()
+            Notification.query.filter_by(serie_id=serie_id, user_id=current_user.get_id()).delete()
+            db.session.commit()
+
+    def dans_maliste(self, post):
+        s = [i[0] for i in
+             self.querydb(query='select serie_id from liste_series where person_id=?', args=(current_user.get_id(),))]
+        if post['id'] in s:
+            return 'Enlever'
+        else:
+            return 'Ajouter'
+
+    def querydb(self, query, args=(), one=False):
         """
-        Route menant au menu d'accueil
+        Fonction utilitaire pour appeler la base de donnée
+        """
+        dbase = sqlite3.connect('app.db')
+        cur = dbase.execute(query, args)
+        rv = cur.fetchall()
+        cur.close()
+        return (rv[0] if rv else None) if one else rv
+
+    @app.route('/notifications')
+    @login_required
+    def notifications(self):
+        """
+        Route activant le processus de rappatriement des nouvelles séries
+        """
+
+        # Récupère la liste de série préférée de l'utilisateur et effectue une requete api pour chaque série
+        series = current_user.query.join(Liste_series).with_entities(Liste_series.serie_id).all()
+        series = [series[index][0] for index in range(len(series))]
+        urls = ["https://api.betaseries.com/episodes/next?key=7c2f686dfaad&v=3.0&id={}".format(serie) for serie in
+                series]
+        requetes_series = Requete(series, ["episode" for i in range(len(series))], urls, series)
+        requetes = requetes_series.run()
+        # Nettoyage de la réponse : passage en datetime et ecriture dans la base notification
+        s = [i[0] for i in
+             self.querydb('select episode_id from notification where user_id=?', args=(current_user.get_id(),))]
+        for i in requetes:
+            try:
+                if requetes[i]['id'] not in s:
+                    h, m, s = map(int, requetes[i]['date'].split('-'))
+                    notifications = Notification(user_id=current_user.get_id(), serie_id=requetes[i]['show']['id'],
+                                                 date_diffusion=datetime(h, m, s),
+                                                 serie_name=requetes[i]['show']['title'],
+                                                 description=requetes[i]['description'], episode_id=requetes[i]['id'],
+                                                 code=requetes[i]['code'], title=requetes[i]['title'])
+                    db.session.add(notifications)
+            except:
+                pass
+        db.session.commit()
+
+        return (""), 204
+
+
+class SerieView(BaseView):
+    @app.route('/serie/', methods=["GET", "POST"])
+    def serie(self):
+        """
+        Route menant au descriptif d'une série
         """
         # L'utilisateur identifié peut ajouter une nouvelle série à sa liste
         if request.method == 'POST':
             l = literal_eval(request.form.get('button'))
-            ajout(l)
+            self.ajout(l)
             return (""), 204
-        # Page d'accueil, affiche 3 séries au hasard
-        url = "https://api.betaseries.com/shows/random"
-        querystring = {"key": "7c2f686dfaad", "v": "3.0", "nb": "3"}
-        posts = requests.request("GET", url, params=querystring).json()["shows"]
-        for post in posts:
-            if len(post.keys()) == 2:
-                post['images'] = {'show': url_for('static', filename='img/logo.png')}
-            if len(post["description"]) > 500:
-                post["description"] = post["description"][:500] + "..."
-            post['ajout'] = self.dans_maliste(post)
-        bonjour = ""
 
-        # Si l'utilisateur est authentifié, affiche son nom dans le message de bienvenue
-        if current_user.is_authenticated:
-            bonjour = current_user.username
-        return render_template('home.html', posts=posts, bonjour=bonjour)
+        # Appelle l'api pour récupérer les informations pertinentes
+        serie_id = [request.args.get('serie_id', type=int) for i in range(3)]
+        urls = ["https://api.betaseries.com/shows/episodes", "https://api.betaseries.com/shows/seasons",
+                "https://api.betaseries.com/shows/display"]
+        items = ["episodes", "seasons", "show"]
+        requete_serie = Requete(serie_id, items, urls, items)
+        response = requete_serie.run()
+        ajouter = self.dans_maliste({'id': serie_id[0]})
+        return render_template('serie.html', serie_id=serie_id[0], ajouter=ajouter, episodes=response["episodes"],
+                               saisons=response["seasons"],
+                               display=response["show"])
 
 
+class SeriesView(BaseView):
     @app.route('/series/', methods=['GET', 'POST'])
     def series(self):
         """
@@ -54,7 +161,8 @@ class RoutesView(FlaskView):
             url = "https://api.betaseries.com/shows/list"
             starting = request.args.get('starting', default=' ', type=str)
             page = request.args.get('page', default=1, type=int)
-            querystring = {"key": "7c2f686dfaad", "v": "3.0", "order": "alphabetical", "limit": "9", "starting": starting,
+            querystring = {"key": "7c2f686dfaad", "v": "3.0", "order": "alphabetical", "limit": "9",
+                           "starting": starting,
                            "start": (page - 1) * 9, "fields": "id,title,images.show"}
             posts = requests.request("GET", url, params=querystring).json()["shows"]
             for post in posts:
@@ -86,29 +194,76 @@ class RoutesView(FlaskView):
                 self.ajout(l)
                 return (""), 204
 
-    @app.route('/serie/', methods=["GET", "POST"])
-    def serie(self):
+
+class NotificationsView(BaseView):
+
+    decorators = [login_required]
+
+    @route('/', endpoint='messages')
+    def index(self):
         """
-        Route menant au descriptif d'une série
+        Route menant à la page de notifications
         """
-        # L'utilisateur identifié peut ajouter une nouvelle série à sa liste
+
+        notifications = self.querydb('select * from notification where date_diffusion > ? order by date_diffusion asc',
+                                 args=(datetime(2012, 10, 10, 10, 10, 10),))
+        current_user.last_message_read_time = datetime.utcnow()
+        db.session.commit()
+        colonnes = ['id', 'user_id', 'date_diffusion', 'description', 'episode_id', 'serie_name', 'serie_id', 'code',
+                    'title']
+        result = [{colonne: i for colonne, i in zip(colonnes, notification)} for notification in notifications]
+        return render_template('messages.html', messages=result)
+
+
+class MyListView(BaseView):
+
+    @app.route('/', methods=['GET', 'POST'], endpoint='my_list')
+    @login_required
+    def index(self):
+        """
+        Route menant à la page de la liste des séries préférées
+        """
         if request.method == 'POST':
             l = literal_eval(request.form.get('button'))
             self.ajout(l)
             return (""), 204
-
-        # Appelle l'api pour récupérer les informations pertinentes
-        serie_id = [request.args.get('serie_id', type=int) for i in range(3)]
-        urls = ["https://api.betaseries.com/shows/episodes", "https://api.betaseries.com/shows/seasons",
-                "https://api.betaseries.com/shows/display"]
-        items = ["episodes", "seasons", "show"]
-        requete_serie = Requete(serie_id, items, urls, items)
-        response = requete_serie.run()
-        ajouter = self.dans_maliste({'id': serie_id[0]})
-        return render_template('serie.html', serie_id=serie_id[0], ajouter=ajouter, episodes=response["episodes"], saisons=response["seasons"],
-                               display=response["show"])
+        liste = self.querydb('select * from liste_series where person_id = ? order by serie_name asc',
+                         args=(current_user.get_id(),))
+        starting = request.args.get('starting', default=' ', type=str)
+        page = request.args.get('page', default=1, type=int)
+        return render_template('my_list.html', posts=liste, starting=starting, page=page)
 
 
+class HomeView(BaseView):
+    @route('/', methods=['GET', 'POST'], endpoint='index')
+    def index(self):
+        """
+        Route menant au menu d'accueil
+        """
+        # L'utilisateur identifié peut ajouter une nouvelle série à sa liste
+        if request.method == 'POST':
+            l = literal_eval(request.form.get('button'))
+            ajout(l)
+            return (""), 204
+        # Page d'accueil, affiche 3 séries au hasard
+        url = "https://api.betaseries.com/shows/random"
+        querystring = {"key": "7c2f686dfaad", "v": "3.0", "nb": "3"}
+        posts = requests.request("GET", url, params=querystring).json()["shows"]
+        for post in posts:
+            if len(post.keys()) == 2:
+                post['images'] = {'show': url_for('static', filename='img/logo.png')}
+            if len(post["description"]) > 500:
+                post["description"] = post["description"][:500] + "..."
+            post['ajout'] = self.dans_maliste(post)
+        bonjour = ""
+
+        # Si l'utilisateur est authentifié, affiche son nom dans le message de bienvenue
+        if current_user.is_authenticated:
+            bonjour = current_user.username
+        return render_template('home.html', posts=posts, bonjour=bonjour)
+
+
+class LoggerView(BaseView):
     @app.route('/login', methods=['GET', 'POST'])
     def login(self):
         """
@@ -164,151 +319,9 @@ class RoutesView(FlaskView):
         return render_template('register.html', title='Register', form=form)
 
 
-    @app.route('/user/<username>')
-    @login_required
-    def user(self, username):
-        """
-        Route menant à la page utilisateur (A supprimer ?)
-        """
-        user = User.query.filter_by(username=username).first_or_404()
-        posts = [
-            {'author': user, 'body': 'Test post #1'},
-            {'author': user, 'body': 'Test post #2'}
-        ]
-        return render_template('user.html', user=user, posts=posts)
-
-    @app.route('/my_list/', methods=['GET', 'POST'])
-    @login_required
-    def my_list(self):
-        """
-        Route menant à la page de la liste des séries préférées
-        """
-        if request.method == 'POST':
-            l = literal_eval(request.form.get('button'))
-            self.ajout(l)
-            return (""), 204
-        liste = self._querydb('select * from liste_series where person_id = ? order by serie_name asc',
-                         args=(current_user.get_id(),))
-        starting = request.args.get('starting', default=' ', type=str)
-        page = request.args.get('page', default=1, type=int)
-        return render_template('my_list.html', posts=liste, starting=starting, page=page)
-
-
-    @app.route('/notifications')
-    @login_required
-    def notifications(self):
-        """
-        Route activant le processus de rappatriement des nouvelles séries
-        """
-
-        #Récupère la liste de série préférée de l'utilisateur et effectue une requete api pour chaque série
-        series = current_user.query.join(Liste_series).with_entities(Liste_series.serie_id).all()
-        series = [series[index][0] for index in range(len(series))]
-        urls = ["https://api.betaseries.com/episodes/next?key=7c2f686dfaad&v=3.0&id={}".format(serie) for serie in series]
-        requetes_series = Requete(series, ["episode" for i in range(len(series))], urls, series)
-        requetes = requetes_series.run()
-        #Nettoyage de la réponse : passage en datetime et ecriture dans la base notification
-        s = [i[0] for i in self._querydb('select episode_id from notification where user_id=?', args=(current_user.get_id(),))]
-        for i in requetes:
-            try:
-                if requetes[i]['id'] not in s:
-                    h,m,s = map(int, requetes[i]['date'].split('-'))
-                    notifications = Notification(user_id=current_user.get_id(), serie_id=requetes[i]['show']['id'], date_diffusion=datetime(h,m,s), serie_name=requetes[i]['show']['title'], description=requetes[i]['description'], episode_id=requetes[i]['id'], code=requetes[i]['code'], title=requetes[i]['title'])
-                    db.session.add(notifications)
-            except:
-                pass
-        db.session.commit()
-
-        return (""), 204
-
-    @app.route('/messages')
-    @login_required
-    def messages(self):
-        """
-        Route menant à la page de notifications
-        """
-
-        notifications = _querydb('select * from notification where date_diffusion > ? order by date_diffusion asc', args=(datetime(2012, 10, 10, 10, 10, 10),))
-        current_user.last_message_read_time = datetime.utcnow()
-        db.session.commit()
-        colonnes = ['id', 'user_id', 'date_diffusion', 'description', 'episode_id', 'serie_name', 'serie_id', 'code', 'title']
-        result = [{colonne:i for colonne, i in zip(colonnes, notification)} for notification in notifications]
-        return render_template('messages.html', messages=result)
-
-    # helpers
-
-    def _querydb(self, query, args=(), one=False):
-        """
-        Fonction utilitaire pour appeler la base de donnée
-        """
-        dbase = sqlite3.connect('app.db')
-        cur = dbase.execute(query, args)
-        rv = cur.fetchall()
-        cur.close()
-        return (rv[0] if rv else None) if one else rv
-
-    def ajout(self, l):
-        s = [i[0] for i in self._querydb('select serie_id from liste_series where person_id=?', args=(current_user.get_id(),))]
-        serie_id = int(l[0])
-        if serie_id not in s:
-            serie_name = l[1]
-            serie_pictureurl = l[2]
-            serie = Liste_series(person_id=current_user.get_id(), serie_id=serie_id, serie_name=serie_name,
-                                 serie_pictureurl=serie_pictureurl)
-            db.session.add(serie)
-            db.session.commit()
-        else:
-            Liste_series.query.filter_by(serie_id=serie_id, person_id=current_user.get_id()).delete()
-            Notification.query.filter_by(serie_id=serie_id, user_id=current_user.get_id()).delete()
-            db.session.commit()
-
-
-    def dans_maliste(self, post):
-        s = [i[0] for i in self._querydb(query='select serie_id from liste_series where person_id=?', args=(current_user.get_id(),))]
-        if post['id'] in s:
-            return 'Enlever'
-        else:
-            return 'Ajouter'
-
-class Requete:
-    """
-    Cette classe permet d'effectuer des api call en parallèle
-    """
-
-    def __init__(self, serie_ids, items, urls, names):
-        self.serie_ids = serie_ids
-        self.querystrings = [{"key": "7c2f686dfaad", "v": "3.0", "id": serie_id} for serie_id in serie_ids]
-        self.urls = urls
-        self.items = items
-        self.response = {}
-        self.queue = Queue()
-        self.verrou = RLock()
-        self.names = names
-        for name in self.names:
-            self.response[name] = ""
-
-    # Crée et lance des thread en parallèle
-    def run(self):
-        self.queue.put(self.response)
-        threads = [Thread(target=self.requete,
-                          args=(querystring, item, self.verrou, self.queue, url, name))
-                   for (querystring, item, url, name) in zip(self.querystrings, self.items, self.urls, self.names)]
-        for thread in threads:
-            thread.start()
-        for thread in threads:
-            thread.join()
-        return self.queue.get()
-
-    # Un thread récupère les informations, et les stocke dans la réponse, gérée par un verrou
-    @staticmethod
-    def requete(querystring, item, verrou, queue, url, name):
-        try:
-            display = requests.request("GET", url, params=querystring).json()[item]
-        except:
-            display = None
-        with verrou:
-            a = queue.get()
-            a[name] = display
-            queue.put(a)
-
-RoutesView.register(app)
+SerieView.register(app, base_class=BaseView)
+SeriesView.register(app, base_class=BaseView)
+NotificationsView.register(app, base_class=BaseView)
+MyListView.register(app, base_class=BaseView)
+HomeView.register(app, base_class=BaseView)
+LoggerView.register(app, base_class=BaseView)
