@@ -1,4 +1,4 @@
-from flask import render_template, flash, redirect, url_for, request
+from flask import render_template, flash, redirect, url_for, request, session
 import requests
 from app import app, db
 from app.forms import LoginForm, RegistrationForm
@@ -8,22 +8,23 @@ from werkzeug.urls import url_parse
 import sqlite3
 from datetime import datetime
 from ast import literal_eval
-from flask_classful import FlaskView
+from flask_classful import FlaskView, route
 from threading import Thread, RLock
 from queue import Queue
+from flask.ext.session import Session
 
 
-class Routes(FlaskView):
-    @app.route('/', methods=['GET', 'POST'])
-    @app.route('/home/', methods=['GET', 'POST'])
-    def home(self):
+class RoutesView(FlaskView):
+    @route('/', methods=['GET', 'POST'])
+    @route('/home/', methods=['GET', 'POST'])
+    def index(self):
         """
         Route menant au menu d'accueil
         """
         # L'utilisateur identifié peut ajouter une nouvelle série à sa liste
         if request.method == 'POST':
             l = literal_eval(request.form.get('button'))
-            self.ajout(l)
+            ajout(l)
             return (""), 204
         # Page d'accueil, affiche 3 séries au hasard
         url = "https://api.betaseries.com/shows/random"
@@ -114,8 +115,8 @@ class Routes(FlaskView):
         Route menant à la page d'identification
         """
         # Si l'utilisateur est déjà identifié, renvoie à la page d'accueil
-        if current_user.is_authenticated:
-            return redirect(url_for('home'))
+        # if current_user.is_authenticated:
+        #     return redirect(url_for('home'))
 
         # Sinon, récupère les données envoyées, les compare à la base de donnée
         form = LoginForm()
@@ -144,13 +145,13 @@ class Routes(FlaskView):
 
 
     @app.route('/register', methods=['GET', 'POST'])
-    def register():
+    def registering(self):
         """
         Route menant à la page d'inscription
         """
         # Si l'utilisateur est déjà authentifié on retourne la page d'accueil
-        if current_user.is_authenticated:
-            return redirect(url_for('home'))
+        #if current_user.is_authenticated:
+        #    return redirect(url_for('home'))
         form = RegistrationForm()
         # Si le formulaire est correct on enregistre le nouvel utilisateur dans la base
         if form.validate_on_submit():
@@ -165,7 +166,7 @@ class Routes(FlaskView):
 
     @app.route('/user/<username>')
     @login_required
-    def user(username):
+    def user(self, username):
         """
         Route menant à la page utilisateur (A supprimer ?)
         """
@@ -186,7 +187,7 @@ class Routes(FlaskView):
             l = literal_eval(request.form.get('button'))
             self.ajout(l)
             return (""), 204
-        liste = self.query_db('select * from liste_series where person_id = ? order by serie_name asc',
+        liste = self._querydb('select * from liste_series where person_id = ? order by serie_name asc',
                          args=(current_user.get_id(),))
         starting = request.args.get('starting', default=' ', type=str)
         page = request.args.get('page', default=1, type=int)
@@ -207,7 +208,7 @@ class Routes(FlaskView):
         requetes_series = Requete(series, ["episode" for i in range(len(series))], urls, series)
         requetes = requetes_series.run()
         #Nettoyage de la réponse : passage en datetime et ecriture dans la base notification
-        s = [i[0] for i in self.query_db('select episode_id from notification where user_id=?', args=(current_user.get_id(),))]
+        s = [i[0] for i in self._querydb('select episode_id from notification where user_id=?', args=(current_user.get_id(),))]
         for i in requetes:
             try:
                 if requetes[i]['id'] not in s:
@@ -220,10 +221,6 @@ class Routes(FlaskView):
 
         return (""), 204
 
-
-
-
-
     @app.route('/messages')
     @login_required
     def messages(self):
@@ -231,17 +228,16 @@ class Routes(FlaskView):
         Route menant à la page de notifications
         """
 
-        notifications = self.query_db('select * from notification where date_diffusion > ? order by date_diffusion asc', args=(datetime(2012, 10, 10, 10, 10, 10),))
+        notifications = _querydb('select * from notification where date_diffusion > ? order by date_diffusion asc', args=(datetime(2012, 10, 10, 10, 10, 10),))
         current_user.last_message_read_time = datetime.utcnow()
         db.session.commit()
         colonnes = ['id', 'user_id', 'date_diffusion', 'description', 'episode_id', 'serie_name', 'serie_id', 'code', 'title']
         result = [{colonne:i for colonne, i in zip(colonnes, notification)} for notification in notifications]
-        print(result)
         return render_template('messages.html', messages=result)
 
     # helpers
 
-    def query_db(query, args=(), one=False):
+    def _querydb(self, query, args=(), one=False):
         """
         Fonction utilitaire pour appeler la base de donnée
         """
@@ -251,8 +247,8 @@ class Routes(FlaskView):
         cur.close()
         return (rv[0] if rv else None) if one else rv
 
-    def ajout(self,l):
-        s = [i[0] for i in self.query_db('select serie_id from liste_series where person_id=?', args=(current_user.get_id(),))]
+    def ajout(self, l):
+        s = [i[0] for i in self._querydb('select serie_id from liste_series where person_id=?', args=(current_user.get_id(),))]
         serie_id = int(l[0])
         if serie_id not in s:
             serie_name = l[1]
@@ -267,8 +263,8 @@ class Routes(FlaskView):
             db.session.commit()
 
 
-    def dans_maliste(self,post):
-        s = [i[0] for i in self.query_db('select serie_id from liste_series where person_id=?', args=(current_user.get_id(),))]
+    def dans_maliste(self, post):
+        s = [i[0] for i in self._querydb(query='select serie_id from liste_series where person_id=?', args=(current_user.get_id(),))]
         if post['id'] in s:
             return 'Enlever'
         else:
@@ -314,3 +310,5 @@ class Requete:
             a = queue.get()
             a[name] = display
             queue.put(a)
+
+RoutesView.register(app)

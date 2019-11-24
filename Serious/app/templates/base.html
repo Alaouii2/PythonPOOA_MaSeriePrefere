@@ -46,7 +46,7 @@
 			<div class="header-warp">
 				<div class="header-bar-warp d-flex">
 					<!-- site logo -->
-					<a href="{{ url_for('home') }}" class="site-logo">
+					<a href="{{ url_for('index') }}" class="site-logo">
 						<img src="{{ url_for('static', filename='img/logo.png')}}" alt="">
 					</a>
 					<nav class="top-nav-area w-100">
@@ -62,7 +62,7 @@
 
 						<!-- Menu -->
 						<ul class="main-menu primary-menu">
-							<li><a href="{{ url_for('home')}}">Accueil</a></li>
+							<li><a href="{{ url_for('index')}}">Accueil</a></li>
 							<li><a href="{{ url_for('series', starting=' ', page=1)}}">Séries</a></li>
                             {% if not current_user.is_anonymous %}
 							<li><a href="{{ url_for('my_list', starting=' ', page=1)}}">Ma Liste</a></li>
@@ -91,7 +91,7 @@
 	<!-- Footer section -->
 	<footer class="footer-section">
 		<div class="container">
-			<a href="{{ url_for('home')}}" class="footer-logo">
+			<a href="{{ url_for('index')}}" class="footer-logo">
 				<img src="{{ url_for('static', filename='img/logo.png')}}" alt="">
 			</a>
 			<div class="copyright"><a href="">Colorlib</a> 2019 @ All rights reserved</div>
