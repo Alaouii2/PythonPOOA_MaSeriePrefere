@@ -199,7 +199,7 @@ class NotificationsView(BaseView):
 
         return (""), 204
 
-    @route('/', endpoint='messages')
+    @route('/notifications', endpoint='messages')
     def index(self):
         """
         Route menant à la page de notifications
@@ -209,7 +209,7 @@ class NotificationsView(BaseView):
                                  args=(datetime(2012, 10, 10, 10, 10, 10),))
         current_user.last_message_read_time = datetime.utcnow()
         db.session.commit()
-        colonnes = ['id', 'user_id', 'date_diffusion', 'description', 'episode_id', 'serie_name', 'serie_id', 'code',
+        colonnes = ['id', 'serie_name', 'series_id', 'user_id', 'date_diffusion', 'description', 'episode_id', 'code',
                     'title']
         result = [{colonne: i for colonne, i in zip(colonnes, notification)} for notification in notifications]
         return render_template('messages.html', messages=result)
