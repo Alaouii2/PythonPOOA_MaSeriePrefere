@@ -265,7 +265,7 @@ class HomeView(BaseView):
 
 
 class LoggerView(BaseView):
-    @route('/', methods=['GET', 'POST'])
+    @route('/login', methods=['GET', 'POST'])
     def login(self):
         """
         Route menant à la page d'identification
@@ -291,7 +291,7 @@ class LoggerView(BaseView):
         return render_template('login.html', title='Sign In', form=form)
 
 
-    @route('/')
+    @route('/logout')
     def logout(self):
         """
         Route activant la déconnexion
@@ -300,7 +300,7 @@ class LoggerView(BaseView):
         return redirect(url_for('index'))
 
 
-    @route('/', methods=['GET', 'POST'])
+    @route('/register', methods=['GET', 'POST'])
     def registering(self):
         """
         Route menant à la page d'inscription
