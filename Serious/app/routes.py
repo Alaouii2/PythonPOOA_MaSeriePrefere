@@ -93,7 +93,7 @@ class BaseView(FlaskView):
 
 
 class SerieView(BaseView):
-    @route('/serie/', methods=["GET", "POST"])
+    @route('/', methods=["GET", "POST"])
     def serie(self):
         """
         Route menant au descriptif d'une série
@@ -118,7 +118,7 @@ class SerieView(BaseView):
 
 
 class SeriesView(BaseView):
-    @route('/series/', methods=['GET', 'POST'])
+    @route('/', methods=['GET', 'POST'])
     def series(self):
         """
         Route menant à la liste de séries disponibles
@@ -166,7 +166,7 @@ class NotificationsView(BaseView):
 
     decorators = [login_required]
 
-    @route('/notifications')
+    @route('/')
     @login_required
     def notifications(self):
         """
@@ -235,6 +235,7 @@ class MyListView(BaseView):
 
 
 class HomeView(BaseView):
+    route_base = '/'
     @route('/', methods=['GET', 'POST'], endpoint='index')
     def index(self):
         """
@@ -264,7 +265,7 @@ class HomeView(BaseView):
 
 
 class LoggerView(BaseView):
-    @route('/login', methods=['GET', 'POST'])
+    @route('/', methods=['GET', 'POST'])
     def login(self):
         """
         Route menant à la page d'identification
@@ -290,7 +291,7 @@ class LoggerView(BaseView):
         return render_template('login.html', title='Sign In', form=form)
 
 
-    @route('/logout')
+    @route('/')
     def logout(self):
         """
         Route activant la déconnexion
@@ -299,7 +300,7 @@ class LoggerView(BaseView):
         return redirect(url_for('index'))
 
 
-    @route('/register', methods=['GET', 'POST'])
+    @route('/', methods=['GET', 'POST'])
     def registering(self):
         """
         Route menant à la page d'inscription
