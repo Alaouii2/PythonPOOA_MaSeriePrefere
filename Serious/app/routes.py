@@ -145,13 +145,15 @@ class SeriesView(BaseView):
                 search = request.form['search']
                 querystring = {"key": "7c2f686dfaad", "v": "3.0", "query": search, "limit": 100}
                 posts = requests.request("GET", url, params=querystring).json()["shows"]
+                urls = ["https://api.betaseries.com/shows/pictures" for i in range(len(posts))]
+                series = [posts[i]["id"] for i in range(len(posts))]
+                requetes_series = Requete(series, ["pictures" for i in range(len(posts))], urls, series)
+                pictures_url = requetes_series.run()
+                picture_url = [pictures_url[id] for id in pictures_url if pictures_url[id][0]['picked'] == 'show']
                 for post in posts:
-                    images_url = "https://api.betaseries.com/shows/pictures"
-                    images = {"key": "7c2f686dfaad", "v": "3.0", "id": post["id"]}
-                    pictures_url = requests.request("GET", images_url, params=images).json()["pictures"]
-                    picture_url = [url for url in pictures_url if url['picked'] == 'show']
                     post['images'] = {
-                        'show': (picture_url[0]['url'] if picture_url else url_for('static', filename='img/logo.png'))}
+                        'show': (pictures_url[post["id"]][0]['url']
+                                 if picture_url else url_for('static', filename='img/logo.png'))}
                     post['ajout'] = self.dans_maliste(post)
                 return render_template('series.html', posts=posts, starting=None, page=None)
 
@@ -167,7 +169,6 @@ class NotificationsView(BaseView):
     decorators = [login_required]
 
     @route('/')
-    @login_required
     def notifications(self):
         """
         Route activant le processus de rappatriement des nouvelles séries
@@ -236,6 +237,7 @@ class MyListView(BaseView):
 
 class HomeView(BaseView):
     route_base = '/'
+
     @route('/', methods=['GET', 'POST'], endpoint='index')
     def index(self):
         """
@@ -292,6 +294,7 @@ class LoggerView(BaseView):
 
 
     @route('/logout')
+    @login_required
     def logout(self):
         """
         Route activant la déconnexion
@@ -306,7 +309,7 @@ class LoggerView(BaseView):
         """
         # Si l'utilisateur est déjà authentifié on retourne la page d'accueil
         if current_user.is_authenticated:
-           return redirect(url_for('index'))
+            return redirect(url_for('index'))
         form = RegistrationForm()
         # Si le formulaire est correct on enregistre le nouvel utilisateur dans la base
         if form.validate_on_submit():
