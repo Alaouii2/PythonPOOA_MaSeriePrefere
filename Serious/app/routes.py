@@ -47,7 +47,7 @@ class Requete:
     def requete(querystring, item, verrou, queue, url, name):
         try:
             display = requests.request("GET", url, params=querystring).json()[item]
-        except:
+        except requests.exceptions.ConnectionError:
             display = None
         with verrou:
             a = queue.get()
@@ -250,13 +250,17 @@ class HomeView(BaseView):
         # Page d'accueil, affiche 3 séries au hasard
         url = "https://api.betaseries.com/shows/random"
         querystring = {"key": "7c2f686dfaad", "v": "3.0", "nb": "3"}
-        posts = requests.request("GET", url, params=querystring).json()["shows"]
-        for post in posts:
-            if len(post.keys()) == 2:
-                post['images'] = {'show': url_for('static', filename='img/logo.png')}
-            if len(post["description"]) > 500:
-                post["description"] = post["description"][:500] + "..."
-            post['ajout'] = self.dans_maliste(post)
+        try:
+            posts = requests.request("GET", url, params=querystring).json()["shows"]
+            for post in posts:
+                if len(post.keys()) == 2:
+                    post['images'] = {'show': url_for('static', filename='img/logo.png')}
+                if len(post["description"]) > 500:
+                    post["description"] = post["description"][:500] + "..."
+                post['ajout'] = self.dans_maliste(post)
+        except requests.exceptions.ConnectionError:
+
+
         bonjour = ""
 
         # Si l'utilisateur est authentifié, affiche son nom dans le message de bienvenue
