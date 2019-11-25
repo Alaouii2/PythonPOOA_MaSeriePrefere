@@ -139,7 +139,7 @@ class SeriesView(BaseView):
                     post['ajout'] = self.dans_maliste(post)
                 return render_template('series.html', posts=posts, starting=starting, page=page)
             except requests.exceptions.ConnectionError:
-                pass
+                return render_template('Connectezvous.html')
 
         elif request.method == 'POST':
             # Affiche les résultat de recherche par nom, par appel à l'api
@@ -161,7 +161,7 @@ class SeriesView(BaseView):
                         post['ajout'] = self.dans_maliste(post)
                     return render_template('series.html', posts=posts, starting=None, page=None)
                 except requests.exceptions.ConnectionError:
-                    pass
+                    return render_template('Connectezvous.html')
 
             # L'utilisateur identifié peut ajouter une nouvelle série à sa liste
             elif "button" in request.form:
@@ -199,8 +199,8 @@ class NotificationsView(BaseView):
                                                  description=requetes[i]['description'], episode_id=requetes[i]['id'],
                                                  code=requetes[i]['code'], title=requetes[i]['title'])
                     db.session.add(notifications)
-            except :
-                pass
+            except requests.exceptions.ConnectionError:
+                return render_template('Connectezvous.html')
         db.session.commit()
 
         return (""), 204
@@ -265,7 +265,7 @@ class HomeView(BaseView):
                     post["description"] = post["description"][:500] + "..."
                 post['ajout'] = self.dans_maliste(post)
         except requests.exceptions.ConnectionError:
-            pass
+            return render_template('Connectezvous.html')
 
         bonjour = ""
 
