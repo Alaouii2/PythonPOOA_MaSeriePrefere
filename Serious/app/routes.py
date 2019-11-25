@@ -74,11 +74,12 @@ class BaseView(FlaskView):
             db.session.commit()
 
     def dans_maliste(self, post):
-        liste_serie = [i[0] for i in
+        s = [i[0] for i in
              self.querydb(query='select serie_id from liste_series where person_id=?', args=(current_user.get_id(),))]
-        action = {True: "Enlever", False: "Ajouter"}
-        return action[post["id"] in liste_serie]
-
+        if post['id'] in s:
+            return 'Enlever'
+        else:
+            return 'Ajouter'
 
     def querydb(self, query, args=(), one=False):
         """
@@ -92,9 +93,8 @@ class BaseView(FlaskView):
 
 
 class SerieView(BaseView):
-
-    @route('/', endpoint='serie', methods=['GET', 'POST'])
-    def index(self):
+    @route('/', methods=["GET", "POST"])
+    def serie(self):
         """
         Route menant au descriptif d'une série
         """
@@ -301,7 +301,6 @@ class LoggerView(BaseView):
         """
         logout_user()
         return redirect(url_for('index'))
-
 
     @route('/register', methods=['GET', 'POST'])
     def registering(self):

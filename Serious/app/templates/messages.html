@@ -10,7 +10,7 @@
 
         <div class="container game-single-content">
         {% for post in messages %}
-            <h2 class="text-white">{{post.serie_name}} - {{post.code}} - {{post.title}}</h2>
+            <h2 class="text-white">{{post.serie_name}} {{post.code}} : {{post.title}}</h2>
             <h5 style="color: white">Date diffusion {{post.date_diffusion[:10]}}</h5>
             <p>{{post.description}}</p>
         {% endfor %}
