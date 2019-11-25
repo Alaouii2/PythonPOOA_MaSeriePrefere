@@ -271,8 +271,8 @@ class LoggerView(BaseView):
         Route menant à la page d'identification
         """
         # Si l'utilisateur est déjà identifié, renvoie à la page d'accueil
-        # if current_user.is_authenticated:
-        #     return redirect(url_for('home'))
+        if current_user.is_authenticated:
+            return redirect(url_for('index'))
 
         # Sinon, récupère les données envoyées, les compare à la base de donnée
         form = LoginForm()
@@ -299,15 +299,14 @@ class LoggerView(BaseView):
         logout_user()
         return redirect(url_for('index'))
 
-
     @route('/register', methods=['GET', 'POST'])
     def registering(self):
         """
         Route menant à la page d'inscription
         """
         # Si l'utilisateur est déjà authentifié on retourne la page d'accueil
-        #if current_user.is_authenticated:
-        #    return redirect(url_for('home'))
+        if current_user.is_authenticated:
+           return redirect(url_for('index'))
         form = RegistrationForm()
         # Si le formulaire est correct on enregistre le nouvel utilisateur dans la base
         if form.validate_on_submit():
