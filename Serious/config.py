@@ -1,3 +1,7 @@
+"""
+Script pour configurer les différents éléments de notre programme (server et base de données)
+"""
+
 import os
 
 basedir = os.path.abspath(os.path.dirname(__file__))
