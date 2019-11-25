@@ -57,15 +57,12 @@ class Requete:
 
 class BaseView(FlaskView):
 
-    def ajout(self, l):
+    def ajout(self, serie_id,title,show):
         s = [i[0] for i in
              self.querydb('select serie_id from liste_series where person_id=?', args=(current_user.get_id(),))]
-        serie_id = int(l[0])
         if serie_id not in s:
-            serie_name = l[1]
-            serie_pictureurl = l[2]
-            serie = Liste_series(person_id=current_user.get_id(), serie_id=serie_id, serie_name=serie_name,
-                                 serie_pictureurl=serie_pictureurl)
+            serie = Liste_series(person_id=current_user.get_id(), serie_id=serie_id, serie_name=title,
+                                 serie_pictureurl=show)
             db.session.add(serie)
             db.session.commit()
         else:
@@ -74,12 +71,11 @@ class BaseView(FlaskView):
             db.session.commit()
 
     def dans_maliste(self, post):
-        s = [i[0] for i in
+        liste_serie = [i[0] for i in
              self.querydb(query='select serie_id from liste_series where person_id=?', args=(current_user.get_id(),))]
-        if post['id'] in s:
-            return 'Enlever'
-        else:
-            return 'Ajouter'
+        action = {True: "Enlever", False: "Ajouter"}
+        return action[post["id"] in liste_serie]
+
 
     def querydb(self, query, args=(), one=False):
         """
@@ -93,15 +89,16 @@ class BaseView(FlaskView):
 
 
 class SerieView(BaseView):
-    @route('/', methods=["GET", "POST"])
-    def serie(self):
+
+    @route('/', endpoint='serie', methods=['GET', 'POST'])
+    def index(self):
         """
         Route menant au descriptif d'une série
         """
         # L'utilisateur identifié peut ajouter une nouvelle série à sa liste
         if request.method == 'POST':
-            l = literal_eval(request.form.get('button'))
-            self.ajout(l)
+            serie_id, title, show = literal_eval(request.form.get('button'))
+            self.ajout(serie_id,title,show)
             return (""), 204
 
         # Appelle l'api pour récupérer les informations pertinentes
@@ -145,13 +142,15 @@ class SeriesView(BaseView):
                 search = request.form['search']
                 querystring = {"key": "7c2f686dfaad", "v": "3.0", "query": search, "limit": 100}
                 posts = requests.request("GET", url, params=querystring).json()["shows"]
+                urls = ["https://api.betaseries.com/shows/pictures" for i in range(len(posts))]
+                series = [posts[i]["id"] for i in range(len(posts))]
+                requetes_series = Requete(series, ["pictures" for i in range(len(posts))], urls, series)
+                pictures_url = requetes_series.run()
+                picture_url = [pictures_url[id] for id in pictures_url if pictures_url[id][0]['picked'] == 'show']
                 for post in posts:
-                    images_url = "https://api.betaseries.com/shows/pictures"
-                    images = {"key": "7c2f686dfaad", "v": "3.0", "id": post["id"]}
-                    pictures_url = requests.request("GET", images_url, params=images).json()["pictures"]
-                    picture_url = [url for url in pictures_url if url['picked'] == 'show']
                     post['images'] = {
-                        'show': (picture_url[0]['url'] if picture_url else url_for('static', filename='img/logo.png'))}
+                        'show': (pictures_url[post["id"]][0]['url']
+                                 if picture_url else url_for('static', filename='img/logo.png'))}
                     post['ajout'] = self.dans_maliste(post)
                 return render_template('series.html', posts=posts, starting=None, page=None)
 
@@ -167,7 +166,6 @@ class NotificationsView(BaseView):
     decorators = [login_required]
 
     @route('/')
-    @login_required
     def notifications(self):
         """
         Route activant le processus de rappatriement des nouvelles séries
@@ -236,6 +234,7 @@ class MyListView(BaseView):
 
 class HomeView(BaseView):
     route_base = '/'
+
     @route('/', methods=['GET', 'POST'], endpoint='index')
     def index(self):
         """
@@ -271,8 +270,8 @@ class LoggerView(BaseView):
         Route menant à la page d'identification
         """
         # Si l'utilisateur est déjà identifié, renvoie à la page d'accueil
-        # if current_user.is_authenticated:
-        #     return redirect(url_for('home'))
+        if current_user.is_authenticated:
+            return redirect(url_for('index'))
 
         # Sinon, récupère les données envoyées, les compare à la base de donnée
         form = LoginForm()
@@ -292,6 +291,7 @@ class LoggerView(BaseView):
 
 
     @route('/logout')
+    @login_required
     def logout(self):
         """
         Route activant la déconnexion
@@ -306,8 +306,8 @@ class LoggerView(BaseView):
         Route menant à la page d'inscription
         """
         # Si l'utilisateur est déjà authentifié on retourne la page d'accueil
-        #if current_user.is_authenticated:
-        #    return redirect(url_for('home'))
+        if current_user.is_authenticated:
+            return redirect(url_for('index'))
         form = RegistrationForm()
         # Si le formulaire est correct on enregistre le nouvel utilisateur dans la base
         if form.validate_on_submit():
