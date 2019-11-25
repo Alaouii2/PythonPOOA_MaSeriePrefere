@@ -1,37 +1,18 @@
-# PythonPOOA_MaSeriePrefere
-Le repo pour le projet python Ma série préférée
+# Comment faire marcher le code
 
-## Énoncé
-Plusieurs API proposent gratuitement une base de données sur les séries TV (vous trouverez plus facilement une version anglophone).
-Le projet consiste à créer un site web ou une application qui permet à un utilisateur d’ajouter une série TV à sa liste de séries TV préférées. Une fois dans sa liste, il peut consulter le résumé des épisodes, avoir une alerte lorsque la prochaine diffusion approche.
-L’application devra forcément avoir une interface graphique.
+## Installation des packages requises pour le code
+ * Lancer un terminal
+ * Créer un environement virtuel python
+ * Activer l'environement virtuel sur le terminal
+ * Se placer dans le dossier PythonPOOA_MaSeriePrefere
+ * Tapper "pip install -r requirements.txt"
 
-## Cahier des charges
-Interface graphique. Soit : 
-* Interface web
-  * Django
-  * Flask
+## Créer la base de donnée
 
-* Client lourd
-  * PyQT
-  * Tkinter
+ * Se placer dans le dossier Serious
+ * tapper respectivement "flask db init", "flask db migrate", "flask db upgrade" (vous remarquerez un dossier migrations et un fichier app.db qui se créent)
 
-Compte client avec :
-* Liste de série préférée
-* Résumés des épisodes
-* Alerte de la prochaine diffusion d'un épisode d'une série dans la liste
+## Lancer l'application
 
-Utilitaires :
-* Liste de série via des api des bases de données de séries
-* Possibilité d'ajout à sa liste
-
-## Détails fonctionels
-Tri des séries : en fonction du contenu des API
-* Alphabétique
-* Catégories
-* Plateforme
-* etc...
-
-Liste des API :
-* https://api.thetvdb.com/swagger
-* https://www.betaseries.com/api/
+ * Se placer dans le dossier Serious
+ * Si vous êtes sur Windows tapper directement "flask run" dans le terminal, sinon il faut tapper avant "FLASK_APP=run.py flask run"
