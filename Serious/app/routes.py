@@ -57,12 +57,15 @@ class Requete:
 
 class BaseView(FlaskView):
 
-    def ajout(self, serie_id,title,show):
+    def ajout(self, l):
         s = [i[0] for i in
              self.querydb('select serie_id from liste_series where person_id=?', args=(current_user.get_id(),))]
+        serie_id = int(l[0])
         if serie_id not in s:
-            serie = Liste_series(person_id=current_user.get_id(), serie_id=serie_id, serie_name=title,
-                                 serie_pictureurl=show)
+            serie_name = l[1]
+            serie_pictureurl = l[2]
+            serie = Liste_series(person_id=current_user.get_id(), serie_id=serie_id, serie_name=serie_name,
+                                 serie_pictureurl=serie_pictureurl)
             db.session.add(serie)
             db.session.commit()
         else:
@@ -97,8 +100,8 @@ class SerieView(BaseView):
         """
         # L'utilisateur identifié peut ajouter une nouvelle série à sa liste
         if request.method == 'POST':
-            serie_id, title, show = literal_eval(request.form.get('button'))
-            self.ajout(serie_id,title,show)
+            l = literal_eval(request.form.get('button'))
+            self.ajout(l)
             return (""), 204
 
         # Appelle l'api pour récupérer les informations pertinentes
