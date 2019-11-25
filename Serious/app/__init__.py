@@ -13,6 +13,6 @@ app.config.from_object(Config)
 db = SQLAlchemy(app)
 migrate = Migrate(app, db)
 login = LoginManager(app)
-login.login_view = 'login'
+login.login_view = 'LoggerView:login'
 
 from app import routes, models  # importation des modules qui définiront la structure de la base de données

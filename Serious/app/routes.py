@@ -166,8 +166,7 @@ class SeriesView(BaseView):
 
 class NotificationsView(BaseView):
 
-    decorators = [login_required]
-
+    @login_required
     @route('/')
     def notifications(self):
         """
