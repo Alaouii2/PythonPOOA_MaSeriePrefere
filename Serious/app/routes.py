@@ -131,12 +131,15 @@ class SeriesView(BaseView):
             querystring = {"key": "7c2f686dfaad", "v": "3.0", "order": "alphabetical", "limit": "9",
                            "starting": starting,
                            "start": (page - 1) * 9, "fields": "id,title,images.show"}
-            posts = requests.request("GET", url, params=querystring).json()["shows"]
-            for post in posts:
-                if len(post.keys()) == 2:
-                    post['images'] = {'show': url_for('static', filename='img/logo.png')}
-                post['ajout'] = self.dans_maliste(post)
-            return render_template('series.html', posts=posts, starting=starting, page=page)
+            try:
+                posts = requests.request("GET", url, params=querystring).json()["shows"]
+                for post in posts:
+                    if len(post.keys()) == 2:
+                        post['images'] = {'show': url_for('static', filename='img/logo.png')}
+                    post['ajout'] = self.dans_maliste(post)
+                return render_template('series.html', posts=posts, starting=starting, page=page)
+            except requests.exceptions.ConnectionError:
+                pass
 
         elif request.method == 'POST':
             # Affiche les résultat de recherche par nom, par appel à l'api
@@ -144,18 +147,21 @@ class SeriesView(BaseView):
                 url = "https://api.betaseries.com/search/all"
                 search = request.form['search']
                 querystring = {"key": "7c2f686dfaad", "v": "3.0", "query": search, "limit": 100}
-                posts = requests.request("GET", url, params=querystring).json()["shows"]
-                urls = ["https://api.betaseries.com/shows/pictures" for i in range(len(posts))]
-                series = [posts[i]["id"] for i in range(len(posts))]
-                requetes_series = Requete(series, ["pictures" for i in range(len(posts))], urls, series)
-                pictures_url = requetes_series.run()
-                picture_url = [pictures_url[id] for id in pictures_url if pictures_url[id][0]['picked'] == 'show']
-                for post in posts:
-                    post['images'] = {
-                        'show': (pictures_url[post["id"]][0]['url']
-                                 if picture_url else url_for('static', filename='img/logo.png'))}
-                    post['ajout'] = self.dans_maliste(post)
-                return render_template('series.html', posts=posts, starting=None, page=None)
+                try:
+                    posts = requests.request("GET", url, params=querystring).json()["shows"]
+                    urls = ["https://api.betaseries.com/shows/pictures" for i in range(len(posts))]
+                    series = [posts[i]["id"] for i in range(len(posts))]
+                    requetes_series = Requete(series, ["pictures" for i in range(len(posts))], urls, series)
+                    pictures_url = requetes_series.run()
+                    picture_url = [pictures_url[id] for id in pictures_url if pictures_url[id][0]['picked'] == 'show']
+                    for post in posts:
+                        post['images'] = {
+                            'show': (pictures_url[post["id"]][0]['url']
+                                     if picture_url else url_for('static', filename='img/logo.png'))}
+                        post['ajout'] = self.dans_maliste(post)
+                    return render_template('series.html', posts=posts, starting=None, page=None)
+                except requests.exceptions.ConnectionError:
+                    pass
 
             # L'utilisateur identifié peut ajouter une nouvelle série à sa liste
             elif "button" in request.form:
@@ -193,7 +199,7 @@ class NotificationsView(BaseView):
                                                  description=requetes[i]['description'], episode_id=requetes[i]['id'],
                                                  code=requetes[i]['code'], title=requetes[i]['title'])
                     db.session.add(notifications)
-            except:
+            except :
                 pass
         db.session.commit()
 
@@ -259,7 +265,7 @@ class HomeView(BaseView):
                     post["description"] = post["description"][:500] + "..."
                 post['ajout'] = self.dans_maliste(post)
         except requests.exceptions.ConnectionError:
-
+            pass
 
         bonjour = ""
 
