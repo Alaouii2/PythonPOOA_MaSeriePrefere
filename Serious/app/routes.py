@@ -191,7 +191,7 @@ class NotificationsView(BaseView):
              self.querydb('select episode_id from notification where user_id=?', args=(current_user.get_id(),))]
         for i in requetes:
             try:
-                if requetes[i]['id'] not in s:
+                if requetes[i]['show']['id'] not in s:
                     h, m, s = map(int, requetes[i]['date'].split('-'))
                     notifications = Notification(user_id=current_user.get_id(), serie_id=requetes[i]['show']['id'],
                                                  date_diffusion=datetime(h, m, s),
@@ -199,6 +199,8 @@ class NotificationsView(BaseView):
                                                  description=requetes[i]['description'], episode_id=requetes[i]['id'],
                                                  code=requetes[i]['code'], title=requetes[i]['title'])
                     db.session.add(notifications)
+            except KeyError:
+                pass
             except requests.exceptions.ConnectionError:
                 return render_template('Connectezvous.html')
         db.session.commit()
